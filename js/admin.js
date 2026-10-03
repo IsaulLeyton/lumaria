@@ -18,7 +18,7 @@
   /* ---------- Pestañas ---------- */
   function pintarTabs() {
     document.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === tab));
-    ["pendientes", "reportes", "bloqueados"].forEach((t) => ($("tab-" + t).hidden = t !== tab));
+    ["pendientes", "especies", "reportes", "bloqueados"].forEach((t) => ($("tab-" + t).hidden = t !== tab));
   }
   document.querySelector(".pestanas").addEventListener("click", (ev) => {
     const b = ev.target.closest("[data-tab]");
@@ -29,18 +29,112 @@
   });
   function cargarTab() {
     if (tab === "pendientes") cargarPendientes();
+    if (tab === "especies") cargarEspecies();
     if (tab === "reportes") cargarReportes();
     if (tab === "bloqueados") cargarBloqueados();
   }
 
   async function contar() {
-    const [p, r] = await Promise.all([
+    const [p, r, e] = await Promise.all([
       sb.from("fotos").select("id", { count: "exact", head: true }).eq("estado", "pendiente"),
-      sb.from("reportes").select("id", { count: "exact", head: true }).eq("resuelto", false)
+      sb.from("reportes").select("id", { count: "exact", head: true }).eq("resuelto", false),
+      sb.from("especies_propuestas").select("id", { count: "exact", head: true }).eq("estado", "pendiente")
     ]);
     $("n-pendientes").textContent = p.count || "";
     $("n-reportes").textContent = r.count || "";
+    $("n-especies").textContent = e.count || "";
   }
+
+  /* ---------- Especies propuestas ---------- */
+  const ESTADOS_CONSERVACION = ["Preocupación menor", "Casi amenazada", "Vulnerable", "En peligro",
+    "En peligro crítico", "Extinta en estado silvestre"];
+  const opciones = (lista, actual) => lista.map(([v, t]) =>
+    `<option value="${_esc(v)}" ${String(actual ?? "") === v ? "selected" : ""}>${_esc(t)}</option>`).join("");
+  const enlaceSeguro = (texto) => /^https?:\/\//i.test(texto)
+    ? `<a href="${_esc(texto)}" target="_blank" rel="noopener nofollow">${_esc(texto)}</a>` : _esc(texto);
+
+  async function cargarEspecies() {
+    const cont = $("tab-especies");
+    cont.innerHTML = `<p class="cargando-texto">Cargando…</p>`;
+    const { data, error } = await sb.from("especies_propuestas")
+      .select("*, perfiles(id, nombre)").eq("estado", "pendiente").order("creado", { ascending: true }).limit(50);
+    if (error) { cont.innerHTML = `<p class="vacio">${_esc(mensajeError(error))}</p>`; return; }
+    if (!data.length) { cont.innerHTML = `<div class="vacio"><b>¡Todo al día!</b>No hay especies esperando revisión.</div>`; return; }
+    const urls = await urlsFotos(data.map((p) => p.ruta_foto), "especies");
+
+    cont.innerHTML = `<div class="lista-moderacion">${data.map((p, i) => {
+      const r = regionPorId(p.region);
+      const norm = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+      const repetida = r && especiesDe(r).find((e) => norm(e.cientifico) === norm(p.cientifico) || norm(e.nombre) === norm(p.nombre));
+      return `
+      <article class="mod-item mod-especie" data-id="${p.id}" data-ruta="${_esc(p.ruta_foto)}">
+        <button type="button" class="mod-img" data-ampliar="${_esc(urls[i] || "")}" style="background-image:url('${_esc(urls[i] || "")}')" aria-label="Ampliar foto"></button>
+        <div class="mod-info">
+          <small>Para <b>${_esc(r ? r.nombre : p.region)}</b> · propuesta por <b>${_esc(p.perfiles ? p.perfiles.nombre : "—")}</b> ${haceTiempo(p.creado)}</small>
+          ${repetida ? `<span class="estado-mod rechazada">Ojo: «${_esc(repetida.nombre)}» ya está en esta región</span>` : ""}
+          <div class="edicion">
+            <label>Tipo<select name="tipo">${opciones([["flora", "Flora"], ["fauna", "Fauna"], ["fungi", "Fungi"]], p.tipo)}</select></label>
+            <label>Grupo (hongos)<select name="grupo">${opciones([["", "—"], ["Hongo", "Hongo"], ["Liquen", "Liquen"]], p.grupo || "")}</select></label>
+            <label>Nombre común<input name="nombre" maxlength="60" value="${_esc(p.nombre)}"></label>
+            <label>Nombre científico<input name="cientifico" maxlength="80" value="${_esc(p.cientifico)}"></label>
+            <label class="ancho">Descripción<textarea name="descripcion" rows="3" maxlength="300">${_esc(p.descripcion)}</textarea></label>
+            <label>Conservación<select name="estado_conservacion">${opciones([["", "Sin dato"], ...ESTADOS_CONSERVACION.map((x) => [x, x])], p.estado_conservacion || "")}</select></label>
+            <label>¿Endémica?<select name="endemica">${opciones([["", "No se sabe"], ["true", "Sí"], ["false", "No"]], p.endemica === null ? "" : String(p.endemica))}</select></label>
+          </div>
+          <small><b>Fuente:</b> ${p.fuente ? enlaceSeguro(p.fuente) : "<i>no indicó</i>"}</small>
+          ${p.lugar_foto ? `<small><b>Foto tomada en:</b> ${_esc(p.lugar_foto)}</small>` : ""}
+        </div>
+        <div class="mod-acciones">
+          <button type="button" class="boton chico" data-aprobar-especie>Aprobar</button>
+          <button type="button" class="boton chico claro" data-rechazar-especie>Rechazar</button>
+          <button type="button" class="enlace-peligro" data-bloquear="${p.usuario_id}">Bloquear usuario</button>
+        </div>
+      </article>`;
+    }).join("")}</div>`;
+  }
+
+  $("tab-especies").addEventListener("click", async (ev) => {
+    const amp = ev.target.closest("[data-ampliar]");
+    if (amp) { const d = $("dlg-ampliar"); d.querySelector("img").src = amp.dataset.ampliar; d.showModal(); return; }
+    const item = ev.target.closest(".mod-item");
+    if (!item) return;
+    const id = Number(item.dataset.id);
+
+    if (ev.target.closest("[data-aprobar-especie]")) {
+      // Se envían los textos tal como quedaron, por si la moderación corrigió algo
+      const campo = (n) => item.querySelector(`[name="${n}"]`).value.trim();
+      const cambios = {
+        tipo: campo("tipo"), grupo: campo("tipo") === "fungi" ? campo("grupo") : "",
+        nombre: campo("nombre"), cientifico: campo("cientifico"), descripcion: campo("descripcion"),
+        estado_conservacion: campo("estado_conservacion"),
+        endemica: campo("endemica") === "" ? null : campo("endemica") === "true"
+      };
+      if (cambios.nombre.length < 2 || cambios.cientifico.length < 3 || cambios.descripcion.length < 20) {
+        avisar("Revisa los textos: nombre, nombre científico y descripción (mínimo 20 letras) son obligatorios.", "error");
+        return;
+      }
+      const { error } = await sb.rpc("moderar_especie", { p_id: id, p_estado: "aprobada", p_cambios: cambios });
+      if (error) { avisar(mensajeError(error), "error"); return; }
+      avisar("Especie aprobada: ya aparece en su región.");
+      item.remove(); contar();
+    }
+    if (ev.target.closest("[data-rechazar-especie]")) {
+      const motivo = await pedirTexto({
+        titulo: "Rechazar especie",
+        ayuda: "La persona verá este motivo. La foto se borrará del almacenamiento.",
+        etiqueta: "Motivo", valor: "No pudimos confirmar que la información sea correcta.",
+        largo: true, max: 300, boton: "Rechazar"
+      });
+      if (motivo === null) return;
+      const { error } = await sb.rpc("moderar_especie", { p_id: id, p_estado: "rechazada", p_motivo: motivo });
+      if (error) { avisar(mensajeError(error), "error"); return; }
+      await sb.storage.from("especies").remove([item.dataset.ruta]);
+      avisar("Especie rechazada.");
+      item.remove(); contar();
+    }
+    const bloq = ev.target.closest("[data-bloquear]");
+    if (bloq) await bloquearUsuario(bloq.dataset.bloquear);
+  });
 
   /* ---------- Fotos por revisar ---------- */
   async function cargarPendientes() {

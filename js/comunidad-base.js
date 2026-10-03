@@ -95,13 +95,43 @@ const fechaCorta = (f) => new Date(f + (String(f).length === 10 ? "T12:00:00" : 
 
 /* ---------- URLs de fotos (bucket privado → enlaces firmados) ---------- */
 const _urls = new Map();
-async function urlsFotos(rutas) {
-  const faltan = [...new Set(rutas)].filter((r) => !_urls.has(r));
+/** Enlaces temporales a fotos privadas. `bucket`: "fotos" (comunidad) o "especies" (especies propuestas). */
+async function urlsFotos(rutas, bucket = "fotos") {
+  const clave = (r) => bucket + ":" + r;
+  const faltan = [...new Set(rutas)].filter((r) => r && !_urls.has(clave(r)));
   if (faltan.length) {
-    const { data, error } = await sb.storage.from("fotos").createSignedUrls(faltan, 60 * 60 * 6);
-    if (!error) data.forEach((d) => { if (d.signedUrl) _urls.set(d.path, d.signedUrl); });
+    const { data, error } = await sb.storage.from(bucket).createSignedUrls(faltan, 60 * 60 * 6);
+    if (!error) data.forEach((d) => { if (d.signedUrl) _urls.set(clave(d.path), d.signedUrl); });
   }
-  return rutas.map((r) => _urls.get(r) || null);
+  return rutas.map((r) => _urls.get(clave(r)) || null);
+}
+
+/* ---------- Especies aportadas por la comunidad ---------- */
+const CAMPOS_PROPUESTA = "id, region, tipo, grupo, nombre, cientifico, descripcion, estado_conservacion, endemica, ruta_foto, perfiles(nombre)";
+
+/** Convierte una especie propuesta (fila de Supabase) al mismo formato que las especies de data.js. */
+function especieDePropuesta(p) {
+  return {
+    nombre: p.nombre,
+    cientifico: p.cientifico,
+    desc: p.descripcion,
+    estado: p.estado_conservacion || null,
+    endemica: !!p.endemica,
+    tipo: p.tipo,
+    grupo: p.grupo || undefined,
+    comunidad: { id: p.id, autor: p.perfiles ? p.perfiles.nombre : "la comunidad", ruta: p.ruta_foto }
+  };
+}
+
+/** Reduce una foto a 1600 px y la convierte a JPG (esto además borra los datos GPS ocultos del archivo). */
+async function prepararImagen(file) {
+  const bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
+  const k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bmp.width * k);
+  canvas.height = Math.round(bmp.height * k);
+  canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
+  return new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.85));
 }
 
 /* ---------- Diálogos reutilizables ---------- */

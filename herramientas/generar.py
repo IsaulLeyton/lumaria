@@ -16,6 +16,7 @@ import datetime
 import html
 import json
 import re
+import urllib.request
 from pathlib import Path
 
 # Dirección pública del sitio (sin "/" al final). Cámbiala al publicar.
@@ -125,11 +126,46 @@ def cargar_datos():
     fungi = js_a_python(extraer_literal(texto, "FUNGI"))
     for r in regiones:
         r["fungi"] = fungi.get(r["id"], [])
+        r["comunidad"] = []
+    agregar_especies_comunidad(regiones)
     return regiones
 
 
+def agregar_especies_comunidad(regiones):
+    """Agrega las especies propuestas por la comunidad y aprobadas (se leen de Supabase)."""
+    config = (RAIZ / "js" / "config.js").read_text(encoding="utf-8")
+    url = re.search(r'supabaseUrl:\s*"([^"]*)"', config)
+    clave = re.search(r'supabaseAnonKey:\s*"([^"]*)"', config)
+    if not (url and clave and url.group(1) and clave.group(1)):
+        print("  · comunidad no conectada: se omiten las especies aportadas")
+        return
+    consulta = (f"{url.group(1)}/rest/v1/especies_propuestas?estado=eq.aprobada&order=creado"
+                "&select=region,tipo,grupo,nombre,cientifico,descripcion,estado_conservacion,endemica")
+    pedido = urllib.request.Request(consulta, headers={"apikey": clave.group(1), "Authorization": f"Bearer {clave.group(1)}"})
+    try:
+        with urllib.request.urlopen(pedido, timeout=20) as resp:
+            filas = json.loads(resp.read().decode("utf-8"))
+    except Exception as error:  # sin internet o tabla aún no creada: seguimos sin ellas
+        print(f"  · no se pudieron leer las especies de la comunidad ({error}); se omiten")
+        return
+    por_id = {r["id"]: r for r in regiones}
+    n = 0
+    for f in filas:
+        r = por_id.get(f["region"])
+        if not r or any(x["cientifico"].lower() == f["cientifico"].lower() for x in especies_de(r)):
+            continue
+        r["comunidad"].append({
+            "nombre": f["nombre"], "cientifico": f["cientifico"], "desc": f["descripcion"],
+            "estado": f.get("estado_conservacion"), "endemica": bool(f.get("endemica")),
+            "grupo": f.get("grupo"), "tipo": f["tipo"], "aporte": True,
+        })
+        n += 1
+    print(f"  ✓ {n} especies aportadas por la comunidad")
+
+
 def especies_de(r):
-    return [dict(x, tipo=t) for t in ("flora", "fauna", "fungi") for x in r.get(t, [])]
+    """Especies del atlas (data.js) más las aportadas por la comunidad, que ya traen su tipo."""
+    return [dict(x, tipo=t) for t in ("flora", "fauna", "fungi") for x in r.get(t, [])] + r.get("comunidad", [])
 
 
 def recortar(texto, largo=158):
@@ -152,6 +188,7 @@ def tarjeta_estatica(x):
           <article class="especie" data-sci="{e(x["cientifico"])}">
             <div class="foto"><span class="tipo">{TIPOS[x["tipo"]]}{grupo}</span>{endemica}<div class="foto-vacia"></div></div>
             <div class="cuerpo">
+              {'<span class="aporte-comunidad">Aporte de la comunidad</span>' if x.get("aporte") else ""}
               <h3>{e(x["nombre"])}</h3>
               <span class="cientifico">{e(x["cientifico"])}</span>
               <p>{e(x["desc"])}</p>
@@ -246,9 +283,9 @@ def generar_regiones(regiones):
             "DESC": e(r["desc"]),
             "CHIPS": "".join(f'<span class="chip">{e(c)}</span>' for c in r["ecosistemas"]),
             "DATOS": (
-                f'<div><b>{len(r["flora"])}</b><span>especies de flora</span></div>'
-                f'<div><b>{len(r["fauna"])}</b><span>especies de fauna</span></div>'
-                f'<div><b>{len(r["fungi"])}</b><span>hongos y líquenes</span></div>'
+                f'<div><b>{sum(x["tipo"] == "flora" for x in especies)}</b><span>especies de flora</span></div>'
+                f'<div><b>{sum(x["tipo"] == "fauna" for x in especies)}</b><span>especies de fauna</span></div>'
+                f'<div><b>{sum(x["tipo"] == "fungi" for x in especies)}</b><span>hongos y líquenes</span></div>'
                 f'<div><b>{n_end}</b><span>endémicas</span></div>'
                 f'<div><b>{n_ame}</b><span>amenazadas</span></div>'
             ),

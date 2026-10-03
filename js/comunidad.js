@@ -568,17 +568,6 @@
     setTimeout(() => mapaSubir.invalidateSize(), 60);
   }
 
-  /** Reduce la foto a 1600 px y la convierte a JPG (esto además borra los datos GPS ocultos del archivo). */
-  async function prepararImagen(file) {
-    const bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
-    const k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(bmp.width * k);
-    canvas.height = Math.round(bmp.height * k);
-    canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
-    return new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.85));
-  }
-
   function abrirSubir() {
     if (!COMUNIDAD_ACTIVA) { avisar("La comunidad aún no está conectada.", "error"); return; }
     if (!exigirSesion("Para subir fotos necesitas entrar con tu correo.")) return;

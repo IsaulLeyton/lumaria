@@ -20,15 +20,19 @@
   $("desc").textContent = r.desc;
   $("chips").innerHTML = r.ecosistemas.map((e) => `<span class="chip">${e}</span>`).join("");
 
+  // Especies del atlas (data.js) + las aportadas por la comunidad y aprobadas (se agregan al cargar)
   const especies = especiesDe(r);
-  const endemicas = especies.filter((e) => e.endemica).length;
-  const amenazadas = especies.filter((e) => AMENAZADAS.includes(e.estado)).length;
-  $("datos").innerHTML = `
-    <div><b>${r.flora.length}</b><span>especies de flora</span></div>
-    <div><b>${r.fauna.length}</b><span>especies de fauna</span></div>
-    <div><b>${r.fungi.length}</b><span>hongos y líquenes</span></div>
-    <div><b>${endemicas}</b><span>endémicas</span></div>
-    <div><b>${amenazadas}</b><span>amenazadas</span></div>`;
+
+  function pintarDatos() {
+    const contar = (fn) => especies.filter(fn).length;
+    $("datos").innerHTML = `
+      <div><b>${contar((e) => e.tipo === "flora")}</b><span>especies de flora</span></div>
+      <div><b>${contar((e) => e.tipo === "fauna")}</b><span>especies de fauna</span></div>
+      <div><b>${contar((e) => e.tipo === "fungi")}</b><span>hongos y líquenes</span></div>
+      <div><b>${contar((e) => e.endemica)}</b><span>endémicas</span></div>
+      <div><b>${contar((e) => AMENAZADAS.includes(e.estado))}</b><span>amenazadas</span></div>`;
+  }
+  pintarDatos();
 
   renderChileMap($("mini-mapa"), {
     labels: false, highlight: r.id, compact: true,
@@ -42,13 +46,19 @@
     { id: "fauna", txt: "Fauna", ico: ICONOS.huella, fn: (e) => e.tipo === "fauna" },
     { id: "fungi", txt: "Fungi", ico: ICONOS.hongo, fn: (e) => e.tipo === "fungi" },
     { id: "endemicas", txt: "Endémicas", ico: ICONOS.estrella, fn: (e) => e.endemica },
-    { id: "amenazadas", txt: "Amenazadas", fn: (e) => AMENAZADAS.includes(e.estado) }
+    { id: "amenazadas", txt: "Amenazadas", fn: (e) => AMENAZADAS.includes(e.estado) },
+    { id: "comunidad", txt: "Aportes de la comunidad", fn: (e) => !!e.comunidad, soloSiHay: true }
   ];
   let filtroActual = "todas";
-  $("filtros").innerHTML = filtros.map((f) => `
-    <button class="filtro" data-f="${f.id}" aria-pressed="${f.id === filtroActual}">
-      ${f.ico || ""}${f.txt} <span class="n">${especies.filter(f.fn).length}</span>
-    </button>`).join("");
+  function pintarFiltros() {
+    $("filtros").innerHTML = filtros
+      .filter((f) => !f.soloSiHay || especies.some(f.fn))
+      .map((f) => `
+        <button class="filtro" data-f="${f.id}" aria-pressed="${f.id === filtroActual}">
+          ${f.ico || ""}${f.txt} <span class="n">${especies.filter(f.fn).length}</span>
+        </button>`).join("");
+  }
+  pintarFiltros();
   $("filtros").addEventListener("click", (ev) => {
     const b = ev.target.closest(".filtro");
     if (!b) return;
@@ -58,19 +68,21 @@
   });
 
   /* ---------- Tarjetas ---------- */
+  // Los textos se escapan siempre: las especies de la comunidad los escribe el público
   function tarjeta(e, i) {
-    const est = e.estado ? `<span class="estado ${claseEstado(e.estado)}">${e.estado}</span>` : "";
+    const est = e.estado ? `<span class="estado ${claseEstado(e.estado)}">${_esc(e.estado)}</span>` : "";
     return `
-      <button class="especie" data-sci="${e.cientifico}" style="animation-delay:${i * 50}ms">
+      <button class="especie" data-sci="${_esc(e.cientifico)}" style="animation-delay:${i * 50}ms">
         <div class="foto">
-          <span class="tipo">${iconoTipo(e.tipo)}${TIPOS[e.tipo].etiqueta}${e.grupo ? " · " + e.grupo : ""}</span>
+          <span class="tipo">${iconoTipo(e.tipo)}${TIPOS[e.tipo].etiqueta}${e.grupo ? " · " + _esc(e.grupo) : ""}</span>
           ${e.endemica ? `<span class="endemica">${ICONOS.estrella}Endémica</span>` : ""}
           <div class="foto-vacia cargando">${iconoTipo(e.tipo)}</div>
         </div>
         <div class="cuerpo">
-          <h3>${e.nombre}</h3>
-          <span class="cientifico">${e.cientifico}</span>
-          <p>${e.desc}</p>
+          ${e.comunidad ? `<span class="aporte-comunidad">Aporte de la comunidad</span>` : ""}
+          <h3>${_esc(e.nombre)}</h3>
+          <span class="cientifico">${_esc(e.cientifico)}</span>
+          <p>${_esc(e.desc)}</p>
           ${est}
         </div>
       </button>`;
@@ -86,8 +98,16 @@
     });
   }
 
+  /** Foto y crédito de una especie: de Wikimedia, o de quien la aportó si es de la comunidad. */
+  async function fotoDe(e) {
+    if (!e.comunidad) return infoEspecie(e.cientifico, e.nombre);
+    const [url] = await urlsFotos([e.comunidad.ruta], "especies");
+    return url ? { img: url, imgGrande: url, credito: { comunidad: true, autor: e.comunidad.autor } } : null;
+  }
+  const textoCreditoDe = (c) => c.comunidad ? `Foto: ${c.autor} · Comunidad Lumaria` : textoCredito(c);
+
   function cargarFoto(cont, e) {
-    infoEspecie(e.cientifico, e.nombre).then((info) => {
+    fotoDe(e).then((info) => {
       const vacia = cont.querySelector(".foto-vacia");
       if (vacia) vacia.classList.remove("cargando");
       if (!info || !info.img || !cont.isConnected) return;
@@ -101,8 +121,8 @@
           const ico = document.createElement("span");
           ico.className = "credito-ico";
           ico.textContent = "i";
-          ico.dataset.tip = textoCredito(info.credito);
-          ico.setAttribute("aria-label", textoCredito(info.credito));
+          ico.dataset.tip = textoCreditoDe(info.credito);
+          ico.setAttribute("aria-label", textoCreditoDe(info.credito));
           cont.appendChild(ico);
         }
       };
@@ -171,22 +191,40 @@
     $("modal-foto").innerHTML = `<div class="foto-vacia cargando">${iconoTipo(e.tipo)}</div>`;
     $("modal-credito").innerHTML = "";
     $("modal-foto").style.removeProperty("--fondo");
-    const est = e.estado ? `<span class="estado ${claseEstado(e.estado)}">${e.estado}</span>` : "";
+    const est = e.estado ? `<span class="estado ${claseEstado(e.estado)}">${_esc(e.estado)}</span>` : "";
     $("modal-cuerpo").innerHTML = `
-      <span class="kicker">${TIPOS[e.tipo].etiqueta}${e.grupo ? " · " + e.grupo : ""} · ${r.nombre}</span>
-      <h2 id="modal-titulo" style="margin-top:10px">${e.nombre}</h2>
-      <div class="cientifico">${e.cientifico}</div>
+      <span class="kicker">${TIPOS[e.tipo].etiqueta}${e.grupo ? " · " + _esc(e.grupo) : ""} · ${r.nombre}</span>
+      <h2 id="modal-titulo" style="margin-top:10px">${_esc(e.nombre)}</h2>
+      <div class="cientifico">${_esc(e.cientifico)}</div>
       <div class="etiquetas-modal">
         ${est}
         ${e.endemica ? `<span class="estado" style="--dot:var(--copihue)">Endémica de Chile</span>` : ""}
+        ${e.comunidad ? `<span class="aporte-comunidad">Aporte de la comunidad</span>` : ""}
       </div>
-      <p>${e.desc}</p>
+      <p>${_esc(e.desc)}</p>
       <div id="modal-extra"></div>
       <p class="acciones-contenido">
         <a href="comunidad.html?region=${r.id}&especie=${encodeURIComponent(e.cientifico)}">Ver fotos de la comunidad →</a>
         <a href="comunidad.html?region=${r.id}&subir=1">¿La has visto? Sube tu foto</a>
       </p>`;
     if (typeof modal.showModal === "function") modal.showModal(); else modal.setAttribute("open", "");
+
+    if (e.comunidad) {
+      fotoDe(e).then((info) => {
+        const v = $("modal-foto").querySelector(".foto-vacia");
+        if (!info) { v && v.classList.remove("cargando"); return; }
+        const img = new Image();
+        img.alt = e.nombre;
+        img.onload = () => {
+          $("modal-foto").innerHTML = "";
+          $("modal-foto").style.setProperty("--fondo", `url("${info.img}")`);
+          $("modal-foto").appendChild(img);
+        };
+        img.src = info.img;
+      });
+      $("modal-credito").innerHTML = `Foto y ficha aportadas por <b>${_esc(e.comunidad.autor)}</b> a la comunidad Lumaria · revisadas por la moderación`;
+      return;
+    }
 
     infoEspecie(e.cientifico, e.nombre).then((info) => {
       if (!info) return;
@@ -232,6 +270,22 @@
 
   pintar();
 
+  /* ---------- Especies aportadas por la comunidad (aprobadas) ---------- */
+  if ($("cta-agregar")) $("cta-agregar").href = `agregar-especie.html?region=${r.id}`;
+  const especiesComunidad = (async () => {
+    if (typeof COMUNIDAD_ACTIVA === "undefined" || !COMUNIDAD_ACTIVA) return;
+    const { data, error } = await sb.from("especies_propuestas").select(CAMPOS_PROPUESTA)
+      .eq("region", r.id).eq("estado", "aprobada").order("creado", { ascending: true });
+    if (error || !data.length) return;
+    const yaEstan = new Set(especies.map((e) => e.cientifico.toLowerCase()));
+    const nuevas = data.map(especieDePropuesta).filter((e) => !yaEstan.has(e.cientifico.toLowerCase()));
+    if (!nuevas.length) return;
+    especies.push(...nuevas);
+    pintarDatos();
+    pintarFiltros();
+    pintar();
+  })();
+
   /* ---------- Fotos de la comunidad ---------- */
   $("cta-subir").href = `comunidad.html?region=${r.id}&subir=1`;
   $("cta-comunidad").href = `comunidad.html?region=${r.id}`;
@@ -257,10 +311,14 @@
       </a>`).join("");
   })();
 
-  // Si llegamos desde el buscador, abrir la especie
+  // Si llegamos desde el buscador o un enlace, abrir la especie (puede ser de la comunidad)
   const buscada = params.get("especie");
   if (buscada) {
     const e = especies.find((x) => x.cientifico === buscada);
     if (e) abrirModal(e);
+    else especiesComunidad.then(() => {
+      const c = especies.find((x) => x.cientifico === buscada);
+      if (c) abrirModal(c);
+    });
   }
 })();

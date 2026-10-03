@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agrega una especie · Lumaria</title>
+  <meta name="description" content="¿Falta una especie nativa en Lumaria? Propónla con tu foto y la información de su ficha.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='19' fill='%231f4a38'/%3E%3Cpath d='M12 29c0-9 5-15 16-17-1 11-7 16-16 17Z' fill='%23a8cf7a'/%3E%3Ccircle cx='27.5' cy='27' r='2.6' fill='%23c3283d'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" sizes="64x64" href="imagenes/favicon.png">
+  <link rel="apple-touch-icon" href="imagenes/icono-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="barra">
+    <div class="contenedor">
+      <a class="logo" href="index.html" aria-label="Lumaria, inicio">
+        <span data-logo></span>
+        <span class="logo-txt">Lumaria<span>.</span></span>
+      </a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html#mapa">Mapa</a>
+        <a href="index.html#regiones">Regiones</a>
+        <a href="comunidad.html">Comunidad</a>
+      </nav>
+      <div class="cuenta" id="cuenta"></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-comunidad">
+      <div class="contenedor">
+        <span class="kicker">Construyamos el atlas entre todos</span>
+        <h1>Agrega una especie</h1>
+        <p>¿Conoces una planta, un animal o un hongo nativo que no está en Lumaria? Propónlo con tu foto y su
+          información. Si se aprueba, aparecerá en la página de su región con tu nombre.</p>
+      </div>
+    </section>
+
+    <section class="contenedor agregar">
+      <div class="aviso-config" id="aviso-config" hidden>
+        <b>La comunidad todavía no está conectada.</b> Por ahora no se pueden proponer especies.
+      </div>
+
+      <div class="vacio" id="pedir-sesion" hidden>
+        <b>Entra para proponer una especie</b>
+        Usamos tu correo solo para que puedas entrar; nunca se muestra a otras personas.
+        <div class="acciones" style="justify-content:center"><button class="boton" type="button" id="btn-entrar-especie">Entrar con mi correo</button></div>
+      </div>
+
+      <div class="agregar-grid" id="agregar-grid" hidden>
+        <form class="formulario tarjeta-formulario" id="form-especie" novalidate>
+          <h2>Ficha de la especie</h2>
+          <p class="ayuda">Llena los datos como en las tarjetas del atlas. Antes de publicarse, la moderación revisa que todo esté bien escrito y sea verídico.</p>
+
+          <label>Región donde vive
+            <select name="region" required></select>
+          </label>
+
+          <fieldset class="campo-tipo">
+            <legend>¿Qué es?</legend>
+            <div class="opciones-tipo">
+              <label class="opcion-tipo"><input type="radio" name="tipo" value="flora" required><span><b>🌿 Flora</b><small>Plantas</small></span></label>
+              <label class="opcion-tipo"><input type="radio" name="tipo" value="fauna"><span><b>🐾 Fauna</b><small>Animales</small></span></label>
+              <label class="opcion-tipo"><input type="radio" name="tipo" value="fungi"><span><b>🍄 Fungi</b><small>Hongos y líquenes</small></span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="campo-tipo" id="campo-grupo" hidden>
+            <legend>¿Hongo o liquen?</legend>
+            <div class="opciones-tipo dos">
+              <label class="opcion-tipo"><input type="radio" name="grupo" value="Hongo"><span><b>Hongo</b></span></label>
+              <label class="opcion-tipo"><input type="radio" name="grupo" value="Liquen"><span><b>Liquen</b><small>Hongo asociado a un alga</small></span></label>
+            </div>
+          </fieldset>
+
+          <div class="dos-columnas">
+            <label>Nombre común
+              <input name="nombre" required minlength="2" maxlength="60" placeholder="Ej: Zorro chilla">
+            </label>
+            <label>Nombre científico
+              <input name="cientifico" required minlength="3" maxlength="80" placeholder="Ej: Lycalopex griseus">
+            </label>
+          </div>
+          <small class="pista-especie" id="pista-duplicado"></small>
+
+          <label>Descripción breve
+            <textarea name="descripcion" required minlength="20" maxlength="300" rows="3"
+              placeholder="Una o dos frases, como en las tarjetas: qué la hace especial, dónde vive, cómo reconocerla."></textarea>
+            <small class="contador-letras" id="contador-desc">0 / 300</small>
+          </label>
+
+          <div class="dos-columnas">
+            <label>Estado de conservación
+              <select name="estado_conservacion">
+                <option value="">No sé</option>
+                <option>Preocupación menor</option>
+                <option>Casi amenazada</option>
+                <option>Vulnerable</option>
+                <option>En peligro</option>
+                <option>En peligro crítico</option>
+                <option>Extinta en estado silvestre</option>
+              </select>
+            </label>
+            <label>¿Es endémica de Chile?
+              <select name="endemica">
+                <option value="">No sé</option>
+                <option value="true">Sí, solo vive en Chile</option>
+                <option value="false">No, también vive en otros países</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="campo-foto" id="campo-foto">
+            <input type="file" name="archivo" accept="image/jpeg,image/png,image/webp" required>
+            <span class="campo-foto-vacio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l1.6-2.4h6.8L17 8h3v11H4Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg><b>Elige una foto tuya de la especie</b><small>JPG, PNG o WebP</small></span>
+            <img alt="Vista previa de la foto" hidden>
+          </label>
+
+          <label>¿Dónde tomaste la foto? <small>(opcional)</small>
+            <input name="lugar_foto" maxlength="120" placeholder="Ej: Reserva Nacional Río de los Cipreses">
+          </label>
+
+          <label>¿De dónde viene la información? <small>(recomendado)</small>
+            <input name="fuente" maxlength="300" placeholder="Un enlace (Wikipedia, MMA, iNaturalist…) o un libro">
+            <small class="pista-especie">Ayuda a la moderación a confirmar que los datos son correctos.</small>
+          </label>
+
+          <label class="check">
+            <input type="checkbox" name="acepto" required>
+            <span>La foto es mía y autorizo a Lumaria a usarla en la ficha de esta especie, con mi nombre como autor.
+              La información es correcta según lo que sé y cumple las <a href="privacidad.html#normas" target="_blank">normas de la comunidad</a>.</span>
+          </label>
+
+          <div class="acciones">
+            <button class="boton" type="submit">Enviar a revisión</button>
+          </div>
+        </form>
+
+        <aside class="vista-previa">
+          <span class="kicker">Así se verá tu tarjeta</span>
+          <div id="tarjeta-previa"></div>
+          <p class="ayuda">La tarjeta aparecerá en la región elegida con la etiqueta «Aporte de la comunidad», cuando sea aprobada.</p>
+        </aside>
+      </div>
+
+      <div id="mis-propuestas"></div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <a class="logo" href="index.html"><span data-logo></span><span class="logo-txt">Lumaria<span>.</span></span></a>
+      <span><a href="privacidad.html#normas">Normas de la comunidad</a> · <a href="privacidad.html">Privacidad</a> · <a href="mailto:contacto@lumaria.cl">Contacto</a></span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/comun.js"></script>
+  <script src="js/comunidad-base.js"></script>
+  <script src="js/agregar-especie.js"></script>
+</body>
+</html>

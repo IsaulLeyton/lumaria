@@ -2,6 +2,8 @@
 --  Lumaria — Comunidad (Supabase / PostgreSQL)
 --  Pega TODO este archivo en Supabase → SQL Editor → Run.
 --  Se puede ejecutar una sola vez sobre un proyecto nuevo.
+--  Después, ejecutar también los archivos de supabase/migraciones/ en orden de fecha,
+--  salvo 2026-10-03-tipo-de-foto.sql, que ya está incluido aquí.
 -- =========================================================
 
 -- ---------- Perfiles ----------

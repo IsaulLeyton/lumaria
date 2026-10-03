@@ -71,19 +71,18 @@
     recargar();
   });
 
-  /* ---------- Especies (para filtros y formulario) ---------- */
-  function opcionesEspecies(regionId, conOtra) {
+  /* ---------- Filtro de especies de la galería ---------- */
+  function opcionesEspecies(regionId) {
     const r = regionPorId(regionId);
-    const grupos = r ? [["flora", "Flora"], ["fauna", "Fauna"], ["fungi", "Fungi"]].map(([t, et]) =>
+    return r ? [["flora", "Flora"], ["fauna", "Fauna"], ["fungi", "Fungi"]].map(([t, et]) =>
       `<optgroup label="${et}">${r[t].map((e) => `<option value="${_esc(e.cientifico)}">${_esc(e.nombre)}</option>`).join("")}</optgroup>`
     ).join("") : "";
-    return grupos + (conOtra ? `<option value="__otra">Otra especie / no estoy seguro</option>` : "");
   }
 
   function pintarFiltroEspecie() {
     const sel = $("filtro-especie");
     sel.innerHTML = `<option value="">Todas las especies</option>` +
-      (estado.region === "todas" ? "" : opcionesEspecies(estado.region, false));
+      (estado.region === "todas" ? "" : opcionesEspecies(estado.region));
     sel.value = estado.especie;
     sel.closest("label").hidden = estado.region === "todas";
   }
@@ -428,26 +427,61 @@
     const region = estado.region === "todas" ? "" : estado.region;
     formSubir.region.innerHTML = `<option value="" disabled ${region ? "" : "selected"}>Elige una región</option>` + opcionesRegiones(region);
     actualizarEspeciesForm();
-    if (estado.especie) formSubir.especie.value = estado.especie;
+    // Si llegamos desde la ficha de una especie, el nombre viene escrito
+    const previa = estado.especie && todasLasEspecies().find((e) => e.cientifico === estado.especie);
+    if (previa) formSubir.especie.value = previa.nombre;
     const img = $("campo-foto").querySelector("img");
     img.hidden = true; img.removeAttribute("src");
     $("campo-foto").classList.remove("con-foto");
-    $("campo-otra").hidden = true;
     formSubir.fecha_foto.max = new Date().toISOString().slice(0, 10);
+    actualizarPistaEspecie();
     actualizarNotaUbicacion();
   }
 
+  /* El nombre de la especie se escribe libremente. Si coincide con una especie de Lumaria
+     (por nombre común o científico, sin importar tildes ni mayúsculas), la foto queda
+     conectada con su ficha; si no, se guarda tal como se escribió. */
+  const normalizar = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .toLowerCase().replace(/\s+spp?\.?$/, "").replace(/\s+/g, " ").trim();
+
+  function todasLasEspecies() {
+    const vistas = new Map();
+    REGIONES.forEach((r) => especiesDe(r).forEach((e) => { if (!vistas.has(e.cientifico)) vistas.set(e.cientifico, e); }));
+    return [...vistas.values()];
+  }
+
+  function nombresDe(e) {
+    const entre = e.nombre.match(/\(([^)]+)\)/);
+    return [e.nombre, e.nombre.replace(/\s*\(.*?\)\s*/g, " "), entre && entre[1], e.cientifico].filter(Boolean).map(normalizar);
+  }
+
+  function especiesSugeridas() {
+    const r = regionPorId(formSubir.region.value);
+    const deLaRegion = r ? especiesDe(r) : [];
+    const resto = todasLasEspecies().filter((e) => !deLaRegion.some((x) => x.cientifico === e.cientifico));
+    return [...deLaRegion, ...resto];
+  }
+
   function actualizarEspeciesForm() {
-    const reg = formSubir.region.value;
-    formSubir.especie.innerHTML = reg
-      ? `<option value="" disabled selected>Elige la especie</option>` + opcionesEspecies(reg, true)
-      : `<option value="" disabled selected>Primero elige la región</option>`;
-    $("campo-otra").hidden = true;
+    $("sugerencias-especies").innerHTML = especiesSugeridas()
+      .map((e) => `<option value="${_esc(e.nombre)}" label="${_esc(e.cientifico)}"></option>`).join("");
+    actualizarPistaEspecie();
   }
 
   function especieElegida() {
-    const r = regionPorId(formSubir.region.value);
-    return r ? especiesDe(r).find((e) => e.cientifico === formSubir.especie.value) : null;
+    const escrito = normalizar(formSubir.especie.value || "");
+    if (escrito.length < 2) return null;
+    return especiesSugeridas().find((e) => nombresDe(e).includes(escrito)) || null;
+  }
+
+  function actualizarPistaEspecie() {
+    const pista = $("pista-especie");
+    const escrito = (formSubir.especie.value || "").trim();
+    const e = especieElegida();
+    pista.classList.toggle("coincide", !!e);
+    if (e) pista.textContent = `✓ ${e.nombre} (${e.cientifico}): la foto quedará conectada a su ficha.`;
+    else if (escrito.length >= 2) pista.textContent = "No está en nuestra lista, pero no importa: se guardará tal como lo escribiste y la moderación lo revisará.";
+    else pista.textContent = "Puedes escribir el nombre común o el científico. Si no sabes cuál es, escribe «no sé».";
   }
 
   // Para no exponer especies amenazadas, la ubicación se guarda aproximada
@@ -468,9 +502,8 @@
     const c = CENTROS[formSubir.region.value];
     if (mapaSubir && c) mapaSubir.setView(c, 8);
   });
-  formSubir.especie.addEventListener("change", () => {
-    $("campo-otra").hidden = formSubir.especie.value !== "__otra";
-    formSubir.especie_otra.required = formSubir.especie.value === "__otra";
+  formSubir.especie.addEventListener("input", () => {
+    actualizarPistaEspecie();
     actualizarNotaUbicacion();
   });
   formSubir.archivo.addEventListener("change", () => {
@@ -540,7 +573,7 @@
       const { error } = await sb.from("fotos").insert({
         region: formSubir.region.value,
         especie_cientifico: e ? e.cientifico : null,
-        especie_nombre: e ? e.nombre : formSubir.especie_otra.value.trim(),
+        especie_nombre: e ? e.nombre : formSubir.especie.value.trim(),
         lugar: formSubir.lugar.value.trim(),
         lat: punto ? redondear(punto.lat) : null,
         lng: punto ? redondear(punto.lng) : null,

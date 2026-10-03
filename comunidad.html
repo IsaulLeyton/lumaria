@@ -111,16 +111,15 @@
         <img alt="Vista previa de la foto" hidden>
       </label>
 
-      <div class="dos-columnas">
-        <label>Región
-          <select name="region" required></select>
-        </label>
-        <label>Especie
-          <select name="especie" required></select>
-        </label>
-      </div>
-      <label id="campo-otra" hidden>¿Qué especie es?
-        <input name="especie_otra" maxlength="80" placeholder="Nombre común o científico (o «no sé»)">
+      <label>Región
+        <select name="region" required></select>
+      </label>
+
+      <label>¿Qué especie es?
+        <input name="especie" list="sugerencias-especies" required minlength="2" maxlength="80"
+          autocomplete="off" placeholder="Escribe su nombre: copihue, huemul, digüeñe…">
+        <datalist id="sugerencias-especies"></datalist>
+        <small class="pista-especie" id="pista-especie">Puedes escribir el nombre común o el científico. Si no sabes cuál es, escribe «no sé».</small>
       </label>
 
       <div class="dos-columnas">

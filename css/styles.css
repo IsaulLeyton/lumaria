@@ -538,6 +538,8 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing:
 .campo-foto-vacio b { color: var(--forest); font-size: 1rem; }
 .campo-foto img { max-height: 280px; width: 100%; object-fit: contain; pointer-events: none; }
 .campo-foto.con-foto .campo-foto-vacio { display: none; }
+.pista-especie { font-weight: 500; font-size: .82rem; color: var(--muted); }
+.pista-especie.coincide { color: #23602d; font-weight: 700; }
 .campo-mapa { display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: .88rem; color: var(--ink-2); }
 .campo-mapa small { font-weight: 500; }
 .mapa-leaflet { height: 240px; border-radius: 14px; border: 1.5px solid var(--line); z-index: 0; }

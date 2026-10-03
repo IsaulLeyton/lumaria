@@ -23,7 +23,7 @@
     const r = regionPorId(valor("region"));
     const estado = valor("estado_conservacion");
     const grupo = tipo === "fungi" ? valor("grupo") : "";
-    const etiquetaTipo = tipo ? `${iconoTipo(tipo)}${TIPOS[tipo].etiqueta}${grupo ? " · " + _esc(grupo) : ""}` : "¿Flora, fauna o fungi?";
+    const etiquetaTipo = tipo ? `${iconoTipo(tipo)}${TIPOS[tipo].etiqueta}${grupo ? " · " + _esc(grupo) : ""}` : "¿Flora, Fauna o Funga?";
     $("tarjeta-previa").innerHTML = `
       <article class="especie previa" style="--rc:${r ? r.color : "var(--forest)"}">
         <div class="foto">

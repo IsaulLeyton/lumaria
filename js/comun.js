@@ -16,11 +16,11 @@ function claseEstado(estado) {
   }[estado] || "";
 }
 
-/* ---------- Reinos: flora, fauna y fungi ---------- */
+/* ---------- Flora, Fauna y Funga (el código interno "fungi" se mantiene) ---------- */
 const TIPOS = {
   flora: { etiqueta: "Flora", icono: "hoja" },
   fauna: { etiqueta: "Fauna", icono: "huella" },
-  fungi: { etiqueta: "Fungi", icono: "hongo" }
+  fungi: { etiqueta: "Funga", icono: "hongo" }
 };
 const iconoTipo = (tipo) => ICONOS[TIPOS[tipo].icono];
 

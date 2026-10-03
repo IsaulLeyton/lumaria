@@ -11,7 +11,7 @@
       <div class="preview-vacia">
         <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6c-9 0-16 7-16 16 0 12 16 34 16 34s16-22 16-34c0-9-7-16-16-16Z" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="32" cy="22" r="6" fill="currentColor"/></svg>
         <b>Explora el mapa</b>
-        Pasa el cursor sobre una región para ver un adelanto de su flora, fauna y fungi.
+        Pasa el cursor sobre una región para ver un adelanto de su Flora, Fauna y Funga.
       </div>`;
   }
 
@@ -36,7 +36,7 @@
               ${e.nombre}
             </div>`).join("")}
         </div>
-        <a class="boton" href="${urlRegion(r.id)}">Ver flora, fauna y fungi ${ICONOS.flecha}</a>
+        <a class="boton" href="${urlRegion(r.id)}">Ver Flora, Fauna y Funga ${ICONOS.flecha}</a>
       </div>`;
     preview.querySelectorAll(".foto[data-sci]").forEach((n) => {
       infoEspecie(n.dataset.sci, n.dataset.nom).then((info) => {

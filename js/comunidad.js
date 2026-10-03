@@ -77,7 +77,7 @@
   /* ---------- Filtro de especies de la galería ---------- */
   function opcionesEspecies(regionId) {
     const r = regionPorId(regionId);
-    const grupos = [["flora", "Flora"], ["fauna", "Fauna"], ["fungi", "Fungi"]].filter(([t]) => !estado.tipo || t === estado.tipo);
+    const grupos = [["flora", "Flora"], ["fauna", "Fauna"], ["fungi", "Funga"]].filter(([t]) => !estado.tipo || t === estado.tipo);
     return r ? grupos.map(([t, et]) =>
       `<optgroup label="${et}">${r[t].map((e) => `<option value="${_esc(e.cientifico)}">${_esc(e.nombre)}</option>`).join("")}</optgroup>`
     ).join("") : "";
@@ -95,7 +95,7 @@
     recargar();
   });
 
-  // Filtro Todo / Flora / Fauna / Fungi
+  // Filtro Todo / Flora / Fauna / Funga
   function pintarFiltroTipo() {
     $("filtro-tipo").querySelectorAll("[data-tipo]").forEach((b) =>
       b.setAttribute("aria-pressed", b.dataset.tipo === estado.tipo));
@@ -482,7 +482,7 @@
     if (opcion && !opcion.checked) { opcion.checked = true; actualizarEspeciesForm(); }
   }
 
-  /** Especies de la región primero y luego el resto; con `soloDelTipo`, solo Flora, Fauna o Fungi según lo elegido. */
+  /** Especies de la región primero y luego el resto; con `soloDelTipo`, solo Flora, Fauna o Funga según lo elegido. */
   function especiesSugeridas(soloDelTipo = true) {
     const r = regionPorId(formSubir.region.value);
     const deLaRegion = r ? especiesDe(r) : [];
@@ -534,7 +534,7 @@
   });
   formSubir.especie.addEventListener("input", () => {
     const e = especieElegida();
-    if (e) marcarTipo(e.tipo);  // al reconocer la especie, se marca Flora/Fauna/Fungi sola
+    if (e) marcarTipo(e.tipo);  // al reconocer la especie, se marca Flora/Fauna/Funga sola
     actualizarPistaEspecie();
     actualizarNotaUbicacion();
   });

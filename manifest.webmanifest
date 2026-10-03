@@ -1,7 +1,7 @@
 {
   "name": "Lumaria · Naturaleza nativa de Chile",
   "short_name": "Lumaria",
-  "description": "Atlas de la flora, fauna y fungi nativos de Chile, región por región.",
+  "description": "Atlas de la Flora, Fauna y Funga nativas de Chile, región por región.",
   "lang": "es-CL",
   "start_url": "./index.html",
   "scope": "./",

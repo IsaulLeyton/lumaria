@@ -73,7 +73,7 @@
           <small>Para <b>${_esc(r ? r.nombre : p.region)}</b> · propuesta por <b>${_esc(p.perfiles ? p.perfiles.nombre : "—")}</b> ${haceTiempo(p.creado)}</small>
           ${repetida ? `<span class="estado-mod rechazada">Ojo: «${_esc(repetida.nombre)}» ya está en esta región</span>` : ""}
           <div class="edicion">
-            <label>Tipo<select name="tipo">${opciones([["flora", "Flora"], ["fauna", "Fauna"], ["fungi", "Fungi"]], p.tipo)}</select></label>
+            <label>Tipo<select name="tipo">${opciones([["flora", "Flora"], ["fauna", "Fauna"], ["fungi", "Funga"]], p.tipo)}</select></label>
             <label>Grupo (hongos)<select name="grupo">${opciones([["", "—"], ["Hongo", "Hongo"], ["Liquen", "Liquen"]], p.grupo || "")}</select></label>
             <label>Nombre común<input name="nombre" maxlength="60" value="${_esc(p.nombre)}"></label>
             <label>Nombre científico<input name="cientifico" maxlength="80" value="${_esc(p.cientifico)}"></label>

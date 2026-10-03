@@ -9,7 +9,7 @@
   const idx = REGIONES.indexOf(r);
   const $ = (id) => document.getElementById(id);
 
-  if (!document.body.dataset.region) document.title = `${r.nombre} · Flora, fauna y fungi nativos · Lumaria`;
+  if (!document.body.dataset.region) document.title = `${r.nombre} · Flora, Fauna y Funga nativas · Lumaria`;
   document.body.style.setProperty("--rc", r.color);
 
   /* ---------- Cabecera ---------- */
@@ -44,7 +44,7 @@
     { id: "todas", txt: "Todas", fn: () => true },
     { id: "flora", txt: "Flora", ico: ICONOS.hoja, fn: (e) => e.tipo === "flora" },
     { id: "fauna", txt: "Fauna", ico: ICONOS.huella, fn: (e) => e.tipo === "fauna" },
-    { id: "fungi", txt: "Fungi", ico: ICONOS.hongo, fn: (e) => e.tipo === "fungi" },
+    { id: "fungi", txt: "Funga", ico: ICONOS.hongo, fn: (e) => e.tipo === "fungi" },
     { id: "endemicas", txt: "Endémicas", ico: ICONOS.estrella, fn: (e) => e.endemica },
     { id: "amenazadas", txt: "Amenazadas", fn: (e) => AMENAZADAS.includes(e.estado) },
     { id: "comunidad", txt: "Aportes de la comunidad", fn: (e) => !!e.comunidad, soloSiHay: true }

@@ -44,7 +44,7 @@ NOMBRE_OFICIAL = {
     "aysen": "Región de Aysén",
     "magallanes": "Región de Magallanes",
 }
-TIPOS = {"flora": "Flora", "fauna": "Fauna", "fungi": "Fungi"}
+TIPOS = {"flora": "Flora", "fauna": "Fauna", "fungi": "Funga"}
 AMENAZADAS = {"Vulnerable", "En peligro", "En peligro crítico", "Extinta en estado silvestre"}
 CLASE_ESTADO = {
     "Preocupación menor": "lc", "Casi amenazada": "nt", "Vulnerable": "vu",
@@ -257,14 +257,14 @@ def generar_regiones(regiones):
         n_end = sum(1 for x in especies if x.get("endemica"))
         n_ame = sum(1 for x in especies if x.get("estado") in AMENAZADAS)
 
-        titulo = f"Flora y fauna nativa de la {oficial} | Lumaria"
-        titulo_social = f"Flora y fauna nativa de la {oficial}"
+        titulo = f"Flora, Fauna y Funga nativas de la {oficial} | Lumaria"
+        titulo_social = f"Flora, Fauna y Funga nativas de la {oficial}"
         # Ejemplos para la descripción, en minúscula inicial: "huemul, roble, pudú y digüeñe"
         ejemplos = [x["nombre"][0].lower() + x["nombre"][1:] for x in
                     (r["fauna"][:1] + r["flora"][:1] + r["fauna"][1:2] + r["fungi"][:1])]
         descripcion = recortar(
             f"{len(especies)} especies nativas de la {oficial}: {', '.join(ejemplos)} y más. "
-            f"Flora, fauna y hongos con fotos, estado de conservación y especies endémicas."
+            f"Flora, Fauna y Funga con fotos, estado de conservación y especies endémicas."
         )
 
         ant = regiones[idx - 1]
@@ -345,14 +345,14 @@ def actualizar_paginas(regiones):
     total = len({x["cientifico"] for r in regiones for x in especies_de(r)})
     paginas = {
         "index.html": (
-            "Lumaria · Flora, fauna y fungi nativos de Chile",
-            f"Atlas interactivo de la naturaleza de Chile: {total} especies nativas de flora, fauna y hongos, "
+            "Lumaria · Flora, Fauna y Funga nativas de Chile",
+            f"Atlas interactivo de la naturaleza de Chile: {total} especies nativas de Flora, Fauna y Funga, "
             "región por región, con fotos, especies endémicas y estado de conservación.",
             {
                 "@context": "https://schema.org",
                 "@graph": [
                     {"@type": "WebSite", "name": "Lumaria", "url": f"{SITIO}/", "inLanguage": "es-CL",
-                     "description": "Atlas de la flora, fauna y fungi nativos de Chile, región por región."},
+                     "description": "Atlas de la Flora, Fauna y Funga nativas de Chile, región por región."},
                     {"@type": "Organization", "name": "Lumaria", "url": f"{SITIO}/",
                      "logo": f"{SITIO}/imagenes/compartir.png"},
                 ],
@@ -360,7 +360,7 @@ def actualizar_paginas(regiones):
         ),
         "comunidad.html": (
             "Comunidad · Lumaria",
-            "Comparte tus fotos de la flora, fauna y fungi nativos de Chile, cuenta dónde las tomaste "
+            "Comparte tus fotos de la Flora, Fauna y Funga nativas de Chile, cuenta dónde las tomaste "
             "y conversa con otras personas que aman la naturaleza.",
             None,
         ),

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flora y fauna nativa de Chile, región por región | Lumaria</title>
+  <meta name="description" content="Atlas interactivo de la naturaleza de Chile: flora, fauna y hongos nativos de las 16 regiones, con fotos, especies endémicas y estado de conservación.">
+  <meta name="theme-color" content="#1f4a38">
+  <!-- SEO:INICIO -->
+  <link rel="canonical" href="https://lumaria.cl/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:site_name" content="Lumaria">
+  <meta property="og:title" content="Lumaria · Flora, fauna y fungi nativos de Chile">
+  <meta property="og:description" content="Atlas interactivo de la naturaleza de Chile: 143 especies nativas de flora, fauna y hongos, región por región, con fotos, especies endémicas y estado de conservación.">
+  <meta property="og:url" content="https://lumaria.cl/">
+  <meta property="og:image" content="https://lumaria.cl/imagenes/compartir.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Lumaria · Flora, fauna y fungi nativos de Chile">
+  <meta name="twitter:description" content="Atlas interactivo de la naturaleza de Chile: 143 especies nativas de flora, fauna y hongos, región por región, con fotos, especies endémicas y estado de conservación.">
+  <meta name="twitter:image" content="https://lumaria.cl/imagenes/compartir.png">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "Lumaria",
+      "url": "https://lumaria.cl/",
+      "inLanguage": "es-CL",
+      "description": "Atlas de la flora, fauna y fungi nativos de Chile, región por región."
+    },
+    {
+      "@type": "Organization",
+      "name": "Lumaria",
+      "url": "https://lumaria.cl/",
+      "logo": "https://lumaria.cl/imagenes/compartir.png"
+    }
+  ]
+}
+  </script>
+  <!-- SEO:FIN -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='19' fill='%231f4a38'/%3E%3Cpath d='M12 29c0-9 5-15 16-17-1 11-7 16-16 17Z' fill='%23a8cf7a'/%3E%3Ccircle cx='27.5' cy='27' r='2.6' fill='%23c3283d'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" sizes="64x64" href="imagenes/favicon.png">
+  <link rel="apple-touch-icon" href="imagenes/icono-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="barra">
+    <div class="contenedor">
+      <a class="logo" href="index.html" aria-label="Lumaria, inicio">
+        <span data-logo></span>
+        <span class="logo-txt">Lumaria<span>.</span></span>
+      </a>
+      <nav class="nav" aria-label="Principal">
+        <a href="#mapa">Mapa</a>
+        <a href="#regiones">Regiones</a>
+        <a href="#acerca">Acerca</a>
+        <a href="comunidad.html">Comunidad</a>
+      </nav>
+      <div class="cuenta" id="cuenta"></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="portada" id="mapa">
+      <div class="contenedor portada-grid">
+
+        <div class="columna-info">
+          <span class="kicker">Atlas de la naturaleza nativa</span>
+          <h1 class="titulo-portada">Chile, de la <em>queñoa</em> al <em>calafate</em></h1>
+          <p class="bajada">
+            Más de 4.000 kilómetros de desierto, bosque, hielo y mar. Elige una región en el mapa
+            y descubre las plantas, animales y hongos que la hacen única.
+          </p>
+
+          <div class="buscador" role="search">
+            <svg class="lupa" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input id="buscar" type="search" placeholder="Busca una especie: huemul, copihue, digüeñe…" autocomplete="off" aria-label="Buscar especie" aria-controls="resultados">
+            <div class="resultados" id="resultados" role="listbox"></div>
+          </div>
+
+          <article class="preview" id="preview" aria-live="polite"></article>
+        </div>
+
+        <div class="columna-mapa">
+          <div class="mapa-marco">
+            <span class="mapa-ayuda">Selecciona una región</span>
+            <svg id="mapa-chile" role="img" aria-label="Mapa interactivo de las regiones de Chile"></svg>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="seccion" id="acerca">
+      <div class="contenedor">
+        <div class="cifras" id="cifras"></div>
+      </div>
+    </section>
+
+    <section class="seccion" id="regiones" style="padding-top:0">
+      <div class="contenedor">
+        <div class="seccion-titulo">
+          <div>
+            <span class="kicker">De norte a sur</span>
+            <h2>Las 16 regiones</h2>
+          </div>
+          <p>Cada región guarda ecosistemas distintos: del altiplano y el desierto florido a la selva valdiviana y los canales patagónicos.</p>
+        </div>
+        <div class="grid-regiones" id="grid-regiones">
+  <!-- REGIONES:INICIO -->
+  <a class="tarjeta-region" href="regiones/arica.html" style="--rc:#c9822f"><span class="num">REGIÓN XV</span><h3>Arica y Parinacota</h3><p>Donde el altiplano toca el cielo</p></a><a class="tarjeta-region" href="regiones/tarapaca.html" style="--rc:#cf9440"><span class="num">REGIÓN I</span><h3>Tarapacá</h3><p>Bosques en medio del desierto</p></a><a class="tarjeta-region" href="regiones/antofagasta.html" style="--rc:#d4a052"><span class="num">REGIÓN II</span><h3>Antofagasta</h3><p>El desierto más árido del mundo</p></a><a class="tarjeta-region" href="regiones/atacama.html" style="--rc:#c9a85a"><span class="num">REGIÓN III</span><h3>Atacama</h3><p>Tierra del desierto florido</p></a><a class="tarjeta-region" href="regiones/coquimbo.html" style="--rc:#a8a35a"><span class="num">REGIÓN IV</span><h3>Coquimbo</h3><p>Un bosque que vive de la neblina</p></a><a class="tarjeta-region" href="regiones/valparaiso.html" style="--rc:#7f9a52"><span class="num">REGIÓN V</span><h3>Valparaíso</h3><p>Del continente a las islas oceánicas</p></a><a class="tarjeta-region" href="regiones/metropolitana.html" style="--rc:#6f9550"><span class="num">REGIÓN RM</span><h3>Metropolitana</h3><p>Naturaleza a las puertas de la ciudad</p></a><a class="tarjeta-region" href="regiones/ohiggins.html" style="--rc:#5f9152"><span class="num">REGIÓN VI</span><h3>O&#x27;Higgins</h3><p>Cipreses, palmas y loros</p></a><a class="tarjeta-region" href="regiones/maule.html" style="--rc:#4f8a4f"><span class="num">REGIÓN VII</span><h3>Maule</h3><p>Refugio de árboles únicos</p></a><a class="tarjeta-region" href="regiones/nuble.html" style="--rc:#438350"><span class="num">REGIÓN XVI</span><h3>Ñuble</h3><p>Volcanes y el último huemul del centro</p></a><a class="tarjeta-region" href="regiones/biobio.html" style="--rc:#367c52"><span class="num">REGIÓN VIII</span><h3>Biobío</h3><p>Bosques entre dos cordilleras</p></a><a class="tarjeta-region" href="regiones/araucania.html" style="--rc:#2c7556"><span class="num">REGIÓN IX</span><h3>La Araucanía</h3><p>Tierra de araucarias y volcanes</p></a><a class="tarjeta-region" href="regiones/losrios.html" style="--rc:#22705d"><span class="num">REGIÓN XIV</span><h3>Los Ríos</h3><p>La selva valdiviana</p></a><a class="tarjeta-region" href="regiones/loslagos.html" style="--rc:#1f6a68"><span class="num">REGIÓN X</span><h3>Los Lagos</h3><p>Alerces milenarios y archipiélagos</p></a><a class="tarjeta-region" href="regiones/aysen.html" style="--rc:#2d6478"><span class="num">REGIÓN XI</span><h3>Aysén</h3><p>Patagonia de hielos y fiordos</p></a><a class="tarjeta-region" href="regiones/magallanes.html" style="--rc:#3b5a86"><span class="num">REGIÓN XII</span><h3>Magallanes</h3><p>El fin del mundo</p></a>
+  <!-- REGIONES:FIN -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <a class="logo" href="index.html"><span data-logo></span><span class="logo-txt">Lumaria<span>.</span></span></a>
+      <span>Resúmenes: Wikipedia. Fotografías: autores de Wikimedia Commons — <a href="creditos.html">ver créditos y licencias</a>. Estados de conservación referenciales.</span>
+      <span><a href="privacidad.html">Privacidad y normas</a> · <a href="mailto:contacto@lumaria.cl">Contacto</a></span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/comun.js"></script>
+  <script src="js/comunidad-base.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/inicio.js"></script>
+</body>
+</html>

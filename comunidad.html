@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comunidad · Lumaria</title>
+  <meta name="description" content="Comparte tus fotos de la flora, fauna y fungi nativos de Chile y conversa con otras personas que aman la naturaleza.">
+  <!-- SEO:INICIO -->
+  <link rel="canonical" href="https://lumaria.cl/comunidad.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:site_name" content="Lumaria">
+  <meta property="og:title" content="Comunidad · Lumaria">
+  <meta property="og:description" content="Comparte tus fotos de la flora, fauna y fungi nativos de Chile, cuenta dónde las tomaste y conversa con otras personas que aman la naturaleza.">
+  <meta property="og:url" content="https://lumaria.cl/comunidad.html">
+  <meta property="og:image" content="https://lumaria.cl/imagenes/compartir.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Comunidad · Lumaria">
+  <meta name="twitter:description" content="Comparte tus fotos de la flora, fauna y fungi nativos de Chile, cuenta dónde las tomaste y conversa con otras personas que aman la naturaleza.">
+  <meta name="twitter:image" content="https://lumaria.cl/imagenes/compartir.png">
+  <!-- SEO:FIN -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='19' fill='%231f4a38'/%3E%3Cpath d='M12 29c0-9 5-15 16-17-1 11-7 16-16 17Z' fill='%23a8cf7a'/%3E%3Ccircle cx='27.5' cy='27' r='2.6' fill='%23c3283d'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" sizes="64x64" href="imagenes/favicon.png">
+  <link rel="apple-touch-icon" href="imagenes/icono-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="barra">
+    <div class="contenedor">
+      <a class="logo" href="index.html" aria-label="Lumaria, inicio">
+        <span data-logo></span>
+        <span class="logo-txt">Lumaria<span>.</span></span>
+      </a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html#mapa">Mapa</a>
+        <a href="index.html#regiones">Regiones</a>
+        <a href="comunidad.html" aria-current="page">Comunidad</a>
+      </nav>
+      <div class="cuenta" id="cuenta"></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-comunidad">
+      <div class="contenedor">
+        <span class="kicker">Hecha por quienes salen a mirar</span>
+        <h1>Comunidad</h1>
+        <p>Comparte tus fotos de la naturaleza nativa de Chile, cuenta dónde las tomaste y conversa con
+          otras personas sobre lo que encuentran en su región.</p>
+        <div class="hero-acciones">
+          <button class="boton" type="button" id="btn-subir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l1.6-2.4h6.8L17 8h3v11H4Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg> Subir una foto</button>
+          <button class="boton claro" type="button" id="btn-nuevo-hilo">Iniciar un debate</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="contenedor comunidad">
+      <div class="aviso-config" id="aviso-config" hidden>
+        <b>La comunidad todavía no está conectada.</b>
+        Para activarla hay que crear el proyecto en Supabase y pegar sus datos en <code>js/config.js</code>.
+        Los pasos están en <code>supabase/GUIA.md</code>.
+      </div>
+
+      <div class="chips-regiones" id="chips-regiones" role="tablist" aria-label="Filtrar por región"></div>
+
+      <div class="pestanas" role="tablist">
+        <button type="button" role="tab" data-vista="fotos">Fotos</button>
+        <button type="button" role="tab" data-vista="debates">Debates</button>
+      </div>
+
+      <div id="panel-mias"></div>
+
+      <div id="panel-fotos">
+        <div class="barra-filtro">
+          <label>Especie
+            <select id="filtro-especie"><option value="">Todas las especies</option></select>
+          </label>
+        </div>
+        <div class="grid-fotos" id="grid-fotos"></div>
+        <div class="centrado"><button class="boton claro" type="button" id="mas-fotos" hidden>Cargar más fotos</button></div>
+      </div>
+
+      <div id="panel-debates" hidden></div>
+    </section>
+  </main>
+
+  <!-- Ver una foto -->
+  <dialog class="modal" id="dlg-foto" aria-label="Foto de la comunidad">
+    <button class="modal-cerrar" type="button" aria-label="Cerrar">×</button>
+    <div id="dlg-foto-contenido"></div>
+  </dialog>
+
+  <!-- Subir una foto -->
+  <dialog class="modal dialogo ancho" id="dlg-subir" aria-labelledby="titulo-subir">
+    <button class="modal-cerrar" type="button" aria-label="Cerrar">×</button>
+    <form class="formulario" id="form-subir">
+      <h2 id="titulo-subir">Subir una foto</h2>
+      <p class="ayuda">Tu foto quedará <b>en revisión</b> y se publicará cuando la moderación la apruebe.</p>
+
+      <label class="campo-foto" id="campo-foto">
+        <input type="file" name="archivo" accept="image/jpeg,image/png,image/webp" required>
+        <span class="campo-foto-vacio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l1.6-2.4h6.8L17 8h3v11H4Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg><b>Elige una foto</b><small>JPG, PNG o WebP</small></span>
+        <img alt="Vista previa de la foto" hidden>
+      </label>
+
+      <div class="dos-columnas">
+        <label>Región
+          <select name="region" required></select>
+        </label>
+        <label>Especie
+          <select name="especie" required></select>
+        </label>
+      </div>
+      <label id="campo-otra" hidden>¿Qué especie es?
+        <input name="especie_otra" maxlength="80" placeholder="Nombre común o científico (o «no sé»)">
+      </label>
+
+      <div class="dos-columnas">
+        <label>¿Dónde la tomaste?
+          <input name="lugar" required maxlength="120" placeholder="Ej: Parque Nacional Conguillío">
+        </label>
+        <label>Fecha (opcional)
+          <input type="date" name="fecha_foto">
+        </label>
+      </div>
+
+      <div class="campo-mapa">
+        <span>Marca el punto en el mapa <small>(opcional)</small></span>
+        <div id="mapa-subir" class="mapa-leaflet"></div>
+        <small class="ayuda" id="nota-ubicacion">Haz clic en el mapa para marcar el lugar.</small>
+      </div>
+
+      <label>Comentario (opcional)
+        <textarea name="descripcion" rows="3" maxlength="1000" placeholder="Cuéntanos algo del momento: qué hacía, cómo era el lugar…"></textarea>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" name="acepto" required>
+        <span>La foto es mía, cumple las <a href="privacidad.html#normas" target="_blank">normas de la comunidad</a> y autorizo a Lumaria a mostrarla con mi nombre.</span>
+      </label>
+
+      <div class="acciones">
+        <button class="boton claro" type="button" data-cerrar>Cancelar</button>
+        <button class="boton" type="submit">Enviar a revisión</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Nuevo debate -->
+  <dialog class="modal dialogo" id="dlg-hilo" aria-labelledby="titulo-hilo">
+    <button class="modal-cerrar" type="button" aria-label="Cerrar">×</button>
+    <form class="formulario" id="form-hilo">
+      <h2 id="titulo-hilo">Iniciar un debate</h2>
+      <p class="ayuda">Pregunta, comparte un dato o cuenta un avistamiento. Sé amable: los mensajes ofensivos se pueden reportar.</p>
+      <label>Región<select name="region" required></select></label>
+      <label>Título<input name="titulo" required minlength="4" maxlength="120" placeholder="Ej: ¿Dónde ver huemules en Aysén?"></label>
+      <label>Mensaje<textarea name="cuerpo" required rows="6" maxlength="4000"></textarea></label>
+      <div class="acciones">
+        <button class="boton claro" type="button" data-cerrar>Cancelar</button>
+        <button class="boton" type="submit">Publicar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <a class="logo" href="index.html"><span data-logo></span><span class="logo-txt">Lumaria<span>.</span></span></a>
+      <span>Las fotos de la comunidad pertenecen a sus autores. Mapas © colaboradores de OpenStreetMap.</span>
+      <span><a href="privacidad.html#normas">Normas de la comunidad</a> · <a href="privacidad.html">Privacidad</a> · <a href="mailto:contacto@lumaria.cl">Contacto</a></span>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/comun.js"></script>
+  <script src="js/comunidad-base.js"></script>
+  <script src="js/comunidad.js"></script>
+</body>
+</html>

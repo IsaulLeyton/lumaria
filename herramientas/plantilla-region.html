@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="../">
+  <title>{{TITULO}}</title>
+  <meta name="description" content="{{DESCRIPCION}}">
+  <link rel="canonical" href="{{URL}}">
+  <meta name="theme-color" content="{{COLOR}}">
+  <meta property="og:type" content="article">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:site_name" content="Lumaria">
+  <meta property="og:title" content="{{TITULO_SOCIAL}}">
+  <meta property="og:description" content="{{DESCRIPCION}}">
+  <meta property="og:url" content="{{URL}}">
+  <meta property="og:image" content="{{IMAGEN}}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{TITULO_SOCIAL}}">
+  <meta name="twitter:description" content="{{DESCRIPCION}}">
+  <meta name="twitter:image" content="{{IMAGEN}}">
+  <script type="application/ld+json">
+{{JSONLD}}
+  </script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='19' fill='%231f4a38'/%3E%3Cpath d='M12 29c0-9 5-15 16-17-1 11-7 16-16 17Z' fill='%23a8cf7a'/%3E%3Ccircle cx='27.5' cy='27' r='2.6' fill='%23c3283d'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" sizes="64x64" href="imagenes/favicon.png">
+  <link rel="apple-touch-icon" href="imagenes/icono-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-region="{{ID}}" style="--rc:{{COLOR}}">
+
+  <header class="barra">
+    <div class="contenedor">
+      <a class="logo" href="index.html" aria-label="Lumaria, inicio">
+        <span data-logo></span>
+        <span class="logo-txt">Lumaria<span>.</span></span>
+      </a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html#mapa">Mapa</a>
+        <a href="index.html#regiones">Regiones</a>
+        <a href="comunidad.html">Comunidad</a>
+      </nav>
+      <div class="cuenta" id="cuenta"></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-region" id="hero">
+      <div class="contenedor hero-grid">
+        <div>
+          <nav class="migas" aria-label="Ruta"><a href="index.html">Mapa de Chile</a> <span>/</span> <span id="miga-region">{{NOMBRE}}</span></nav>
+          <span class="kicker" id="kicker">{{KICKER}}</span>
+          <h1 id="titulo">{{NOMBRE}}</h1>
+          <p class="lema" id="lema">{{LEMA}}</p>
+          <p class="desc" id="desc">{{DESC}}</p>
+          <div class="chips" id="chips">{{CHIPS}}</div>
+          <div class="datos-region" id="datos">{{DATOS}}</div>
+        </div>
+        <div class="mini-mapa-caja">
+          <svg id="mini-mapa" role="img" aria-label="Ubicación de la región en Chile"></svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion" style="padding-top:24px">
+      <div class="contenedor">
+        <h2 class="titulo-especies">{{H2}}</h2>
+        <div class="filtros" id="filtros" role="toolbar" aria-label="Filtrar especies"></div>
+        <div class="grid-especies" id="especies">{{ESPECIES}}</div>
+        <p class="nota">Estados de conservación referenciales según el Reglamento de Clasificación de Especies (MMA) y la UICN. Resúmenes de Wikipedia. Fotografías de Wikimedia Commons, con el autor y la licencia de cada una en su ficha (botón «i») y en la página de <a href="creditos.html">créditos</a>.</p>
+        <section class="comunidad-region" id="comunidad-region">
+          <div class="seccion-titulo">
+            <div>
+              <span class="kicker">Fotos de la comunidad</span>
+              <h2>Vistas por ustedes</h2>
+            </div>
+            <p>Fotografías tomadas en esta región por personas de la comunidad Lumaria.</p>
+          </div>
+          <div class="grid-fotos" id="fotos-comunidad"></div>
+          <div class="acciones">
+            <a class="boton" id="cta-subir" href="comunidad.html?region={{ID}}&amp;subir=1">Subir mi foto</a>
+            <a class="boton claro" id="cta-comunidad" href="comunidad.html?region={{ID}}">Ver la comunidad de la región</a>
+          </div>
+        </section>
+
+        <nav class="navegacion-regiones" id="nav-regiones" aria-label="Otras regiones">{{NAV}}</nav>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="modal" id="modal" aria-labelledby="modal-titulo">
+    <button class="modal-cerrar" id="modal-cerrar" aria-label="Cerrar">×</button>
+    <div class="modal-foto" id="modal-foto"></div>
+    <div class="modal-credito" id="modal-credito"></div>
+    <div class="modal-cuerpo" id="modal-cuerpo"></div>
+  </dialog>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <a class="logo" href="index.html"><span data-logo></span><span class="logo-txt">Lumaria<span>.</span></span></a>
+      <span>Resúmenes: Wikipedia. Fotografías: autores de Wikimedia Commons — <a href="creditos.html">ver créditos y licencias</a>. Estados de conservación referenciales.</span>
+      <span><a href="privacidad.html">Privacidad y normas</a> · <a href="mailto:contacto@lumaria.cl">Contacto</a></span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/comun.js"></script>
+  <script src="js/comunidad-base.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/region.js"></script>
+</body>
+</html>

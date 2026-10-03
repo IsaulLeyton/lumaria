@@ -369,6 +369,12 @@ def actualizar_paginas(regiones):
             "Autores y licencias de las fotografías de especies nativas de Chile usadas en Lumaria.",
             None,
         ),
+        "glosario.html": (
+            "Aprende: especies endémicas, estados de conservación y más · Lumaria",
+            "Glosario de la naturaleza de Chile explicado de forma simple: especie nativa, endémica e invasora, "
+            "estados de conservación, Flora, Fauna y Funga, nombres científicos y ecosistemas.",
+            None,
+        ),
         "privacidad.html": (
             "Privacidad y normas de la comunidad · Lumaria",
             "Qué datos guarda Lumaria, para qué se usan, cómo pedir que se borren, "
@@ -388,14 +394,14 @@ def actualizar_paginas(regiones):
             )
             texto = reemplazar_entre(texto, "REGIONES", tarjetas, archivo)
         ruta.write_text(texto, encoding="utf-8", newline="\n")
-    print("  ✓ datos para buscadores y redes en index, comunidad, créditos y privacidad")
+    print("  ✓ datos para buscadores y redes en index, glosario, comunidad, créditos y privacidad")
 
 
 # ---------------------------------------------------------------
 #  sitemap.xml y robots.txt
 # ---------------------------------------------------------------
 def generar_sitemap(regiones):
-    urls = [(f"{SITIO}/", "1.0"), (f"{SITIO}/comunidad.html", "0.8"),
+    urls = [(f"{SITIO}/", "1.0"), (f"{SITIO}/glosario.html", "0.8"), (f"{SITIO}/comunidad.html", "0.8"),
             (f"{SITIO}/creditos.html", "0.3"), (f"{SITIO}/privacidad.html", "0.3")]
     urls += [(url_region(r["id"]), "0.9") for r in regiones]
     cuerpo = "\n".join(

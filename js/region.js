@@ -200,6 +200,7 @@
         ${est}
         ${e.endemica ? `<span class="estado" style="--dot:var(--copihue)">Endémica de Chile</span>` : ""}
         ${e.comunidad ? `<span class="aporte-comunidad">Aporte de la comunidad</span>` : ""}
+        ${e.estado || e.endemica ? `<a class="que-significa" href="glosario.html#${e.estado ? "conservacion" : "endemica"}">¿Qué significa?</a>` : ""}
       </div>
       <p>${_esc(e.desc)}</p>
       <div id="modal-extra"></div>

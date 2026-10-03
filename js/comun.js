@@ -143,10 +143,52 @@ async function _fotoCommons(termino) {
   return null;
 }
 
+/** Una foto concreta de Wikimedia Commons, con su autor y licencia (o null si no tiene licencia conocida). */
+async function fotoDeCommons(archivo) {
+  const res = await fetch(`${_API_COMMONS}&prop=imageinfo&iiprop=url|extmetadata|user&iiurlwidth=640` +
+    `&titles=${encodeURIComponent("File:" + archivo)}`);
+  if (!res.ok) return null;
+  const pag = Object.values((await res.json()).query.pages)[0];
+  const ii = pag && pag.imageinfo && pag.imageinfo[0];
+  const credito = ii && _creditoDesdeImageinfo(pag.title, ii);
+  if (!credito) return null;  // solo fotos con autor y licencia conocidos
+  const grande = ii.thumburl.replace(/\/\d+px-/, "/1280px-");
+  return { img: ii.thumburl, imgGrande: grande, credito };
+}
+
+/* Licencias de iNaturalist (versión 4.0) */
+const _LICENCIAS_INAT = {
+  "cc0": ["CC0", "https://creativecommons.org/publicdomain/zero/1.0/"],
+  "cc-by": ["CC BY 4.0", "https://creativecommons.org/licenses/by/4.0/"],
+  "cc-by-sa": ["CC BY-SA 4.0", "https://creativecommons.org/licenses/by-sa/4.0/"],
+  "cc-by-nc": ["CC BY-NC 4.0", "https://creativecommons.org/licenses/by-nc/4.0/"],
+  "cc-by-nc-sa": ["CC BY-NC-SA 4.0", "https://creativecommons.org/licenses/by-nc-sa/4.0/"]
+};
+
+/** Foto de iNaturalist a partir de [id, licencia, autor, extensión] (ver FOTOS_ELEGIDAS en data.js). */
+function fotoDeINaturalist([id, licencia, autor, ext]) {
+  const base = `https://inaturalist-open-data.s3.amazonaws.com/photos/${id}`;
+  const [nombreLicencia, urlLicencia] = _LICENCIAS_INAT[licencia] || [licencia, null];
+  return {
+    img: `${base}/medium.${ext}`,
+    imgGrande: `${base}/large.${ext}`,
+    credito: { autor, licencia: nombreLicencia, licenciaUrl: urlLicencia, fuente: `https://www.inaturalist.org/photos/${id}`, sitio: "iNaturalist" }
+  };
+}
+
+/** Foto elegida a mano para una especie, si la hay. */
+async function _fotoElegida(cientifico) {
+  const f = typeof FOTOS_ELEGIDAS !== "undefined" && FOTOS_ELEGIDAS[cientifico];
+  if (!f) return null;
+  if (f.inat) return fotoDeINaturalist(f.inat);
+  if (f.commons) return fotoDeCommons(f.commons);
+  return null;
+}
+
 /** Busca foto, resumen y crédito de una especie.
  *  Devuelve {img, imgGrande, credito, extracto, url, lang} o null. */
 function infoEspecie(cientifico, nombreComun) {
-  const key = "lumaria:v4:" + cientifico;
+  const key = "lumaria:v5:" + cientifico;
   if (_memoria[key]) return _memoria[key];
   const cache = _leerCache(key);
   if (cache) return (_memoria[key] = Promise.resolve(cache));
@@ -160,6 +202,8 @@ function infoEspecie(cientifico, nombreComun) {
 
   const p = (async () => {
     let mejor = null, errorDeRed = false;
+    let elegida = null;
+    try { elegida = await _fotoElegida(cientifico); } catch (e) { errorDeRed = true; }
     for (const [lang, t] of intentos) {
       try {
         const r = await _resumen(lang, t);
@@ -170,6 +214,12 @@ function infoEspecie(cientifico, nombreComun) {
         }
         if (r && !mejor) mejor = r;
       } catch (e) { /* sin conexión: seguimos */ }
+    }
+    // Una foto elegida a mano manda sobre la de Wikipedia (se conserva el resumen del artículo)
+    if (elegida) {
+      mejor = { ...(mejor || { extracto: "", url: null, lang: "es" }), ...elegida };
+      if (!errorDeRed) _guardarCache(key, mejor);
+      return mejor;
     }
     // Solo usamos fotos cuyo autor y licencia conocemos
     if (mejor && mejor.img) {
@@ -194,7 +244,7 @@ function _esc(s) {
 
 /** Texto plano del crédito, para tooltips. */
 function textoCredito(c) {
-  return c ? `Foto: ${c.autor} · ${c.licencia} · Wikimedia Commons` : "";
+  return c ? `Foto: ${c.autor} · ${c.licencia} · ${c.sitio || "Wikimedia Commons"}` : "";
 }
 
 /** Crédito con enlaces al original y a la licencia. */
@@ -203,7 +253,8 @@ function htmlCredito(c) {
   const lic = c.licenciaUrl
     ? `<a href="${_esc(c.licenciaUrl)}" target="_blank" rel="noopener license">${_esc(c.licencia)}</a>`
     : _esc(c.licencia);
-  return `Foto: <a href="${_esc(c.fuente)}" target="_blank" rel="noopener">${_esc(c.autor)}</a> · ${lic} · ` +
+  return `Foto: <a href="${_esc(c.fuente)}" target="_blank" rel="noopener">${_esc(c.autor)}</a>` +
+    `${c.sitio ? " (" + _esc(c.sitio) + ")" : ""} · ${lic} · ` +
     `<a href="${_esc(c.fuente)}" target="_blank" rel="noopener">Ver original</a>`;
 }
 

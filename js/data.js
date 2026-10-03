@@ -590,7 +590,8 @@ const FOCOS = {
   "Spheniscus humboldti": "50% 15%",
   "Jubaea chilensis": "50% 35%",
   "Nothofagus macrocarpa": "50% 30%",
-  "Cyanoliseus patagonus bloxami": "50% 20%",
+  "Cyanoliseus patagonus bloxami": "50% 0%",
+  "Berberidopsis corallina": "50% 70%",
   "Puma concolor": "50% 20%",
   "Strix rufipes": "50% 20%",
   "Araucaria araucana": "50% 5%",
@@ -598,4 +599,24 @@ const FOCOS = {
   "Spheniscus magellanicus": "50% 5%",
   "Aptenodytes patagonicus": "50% 0%",
   "Azorella compacta": "50% 75%"
+};
+
+/* =========================================================
+   Fotos elegidas a mano: reemplazan la foto automática de Wikipedia
+   cuando esa es un dibujo, no existe o es equivocada.
+     commons: nombre del archivo en Wikimedia Commons
+     inat:    foto de iNaturalist → [id de la foto, licencia, autor, extensión]
+   Solo licencias libres (cc0, cc-by, cc-by-sa) o «no comercial» (cc-by-nc),
+   que sirve mientras Lumaria no tenga fines de lucro.
+   ========================================================= */
+const FOTOS_ELEGIDAS = {
+  "Telmatobius dankoi":            { inat: [81091244, "cc-by-nc", "Felipe Rabanal", "jpg"] },
+  "Grifola gargal":                { inat: [403880366, "cc-by", "La florifunga", "jpeg"] },
+  "Rhodophiala phycelloides":      { inat: [501511350, "cc-by", "Cesar Ormazabal", "jpg"] },
+  "Peumus boldus":                 { inat: [691783911, "cc-by", "Gabriela Cartes", "jpg"] },
+  "Cyanoliseus patagonus bloxami": { inat: [122450946, "cc-by", "felipejarafer", "jpg"] },
+  "Berberidopsis corallina":       { inat: [354439144, "cc-by-nc", "Edgardo Flores", "jpeg"] },
+  "Fuchsia magellanica":           { inat: [19330562, "cc-by", "Javier Conejeros Gastó", "jpg"] },
+  "Berberis microphylla":          { inat: [113833284, "cc-by", "Nicolás Lavandero", "jpeg"] },
+  "Roccella spp.":                 { commons: "Roccella gracilis - Flickr - pellaea.jpg" }
 };

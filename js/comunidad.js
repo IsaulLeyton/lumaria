@@ -22,6 +22,7 @@
     vista: params.get("vista") === "debates" || params.get("hilo") ? "debates" : "fotos",
     hilo: params.get("hilo") ? Number(params.get("hilo")) : null,
     especie: params.get("especie") || "",
+    tipo: TIPOS[params.get("tipo")] ? params.get("tipo") : "",
     mias: params.has("mias"),
     pagina: 0
   };
@@ -32,10 +33,12 @@
     if (estado.vista === "debates") p.set("vista", "debates");
     if (estado.hilo) p.set("hilo", estado.hilo);
     if (estado.especie) p.set("especie", estado.especie);
+    if (estado.tipo) p.set("tipo", estado.tipo);
     if (estado.mias) p.set("mias", "1");
     history.replaceState(null, "", "comunidad.html" + (p.toString() ? "?" + p : ""));
   }
 
+  const EMOJI_TIPO = { flora: "🌿", fauna: "🐾", fungi: "🍄" };
   const nombreRegion = (id) => (regionPorId(id) || {}).nombre || id;
   const colorRegion = (id) => (regionPorId(id) || {}).color || "var(--forest)";
 
@@ -74,7 +77,8 @@
   /* ---------- Filtro de especies de la galería ---------- */
   function opcionesEspecies(regionId) {
     const r = regionPorId(regionId);
-    return r ? [["flora", "Flora"], ["fauna", "Fauna"], ["fungi", "Fungi"]].map(([t, et]) =>
+    const grupos = [["flora", "Flora"], ["fauna", "Fauna"], ["fungi", "Fungi"]].filter(([t]) => !estado.tipo || t === estado.tipo);
+    return r ? grupos.map(([t, et]) =>
       `<optgroup label="${et}">${r[t].map((e) => `<option value="${_esc(e.cientifico)}">${_esc(e.nombre)}</option>`).join("")}</optgroup>`
     ).join("") : "";
   }
@@ -91,6 +95,21 @@
     recargar();
   });
 
+  // Filtro Todo / Flora / Fauna / Fungi
+  function pintarFiltroTipo() {
+    $("filtro-tipo").querySelectorAll("[data-tipo]").forEach((b) =>
+      b.setAttribute("aria-pressed", b.dataset.tipo === estado.tipo));
+  }
+  $("filtro-tipo").addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-tipo]");
+    if (!b) return;
+    estado.tipo = b.dataset.tipo;
+    estado.especie = "";
+    pintarFiltroTipo();
+    pintarFiltroEspecie();
+    recargar();
+  });
+
   /* ---------- Fotos ---------- */
   // Si se pide una carga nueva mientras otra está en curso, la anterior se descarta
   // (si no, ambas agregarían sus fotos y aparecerían duplicadas).
@@ -101,11 +120,12 @@
     if (reiniciar) { estado.pagina = 0; grid.innerHTML = `<p class="cargando-texto">Cargando fotos…</p>`; }
     const desde = estado.pagina * POR_PAGINA;
     let q = sb.from("fotos")
-      .select("id, region, especie_nombre, especie_cientifico, lugar, ruta, creado, perfiles(nombre), comentarios(count)")
+      .select("id, region, tipo, especie_nombre, especie_cientifico, lugar, ruta, creado, perfiles(nombre), comentarios(count)")
       .eq("estado", "aprobada")
       .order("creado", { ascending: false })
       .range(desde, desde + POR_PAGINA - 1);
     if (estado.region !== "todas") q = q.eq("region", estado.region);
+    if (estado.tipo) q = q.eq("tipo", estado.tipo);
     if (estado.especie) q = q.eq("especie_cientifico", estado.especie);
     const { data, error } = await q;
     if (miCarga !== cargaFotos) return;
@@ -130,7 +150,8 @@
     const n = (f.comentarios && f.comentarios[0] && f.comentarios[0].count) || 0;
     return `
       <button type="button" class="foto-comunidad" data-foto="${f.id}" style="--rc:${colorRegion(f.region)}">
-        <span class="fc-img">${url ? `<img src="${_esc(url)}" alt="${_esc(f.especie_nombre)}" loading="lazy">` : ""}</span>
+        <span class="fc-img">${url ? `<img src="${_esc(url)}" alt="${_esc(f.especie_nombre)}" loading="lazy">` : ""}
+          ${TIPOS[f.tipo] ? `<span class="fc-tipo">${EMOJI_TIPO[f.tipo]} ${TIPOS[f.tipo].etiqueta}</span>` : ""}</span>
         <span class="fc-info">
           <b>${_esc(f.especie_nombre)}</b>
           <small>${_esc(f.lugar)} · ${_esc(nombreRegion(f.region))}</small>
@@ -218,7 +239,7 @@
       <div class="modal-foto" style="--fondo:url('${_esc(url || "")}')">${url ? `<img src="${_esc(url)}" alt="${_esc(f.especie_nombre)}">` : ""}</div>
       <div class="modal-credito">Foto: <b>${_esc(f.perfiles ? f.perfiles.nombre : "—")}</b> · Todos los derechos reservados por su autor</div>
       <div class="modal-cuerpo">
-        <span class="kicker">${_esc(nombreRegion(f.region))}</span>
+        <span class="kicker">${TIPOS[f.tipo] ? TIPOS[f.tipo].etiqueta + " · " : ""}${_esc(nombreRegion(f.region))}</span>
         <h2 style="margin-top:10px">${_esc(f.especie_nombre)}</h2>
         ${f.especie_cientifico ? `<div class="cientifico">${_esc(f.especie_cientifico)}</div>` : ""}
         <ul class="datos-foto">
@@ -429,7 +450,7 @@
     actualizarEspeciesForm();
     // Si llegamos desde la ficha de una especie, el nombre viene escrito
     const previa = estado.especie && todasLasEspecies().find((e) => e.cientifico === estado.especie);
-    if (previa) formSubir.especie.value = previa.nombre;
+    if (previa) { formSubir.especie.value = previa.nombre; marcarTipo(previa.tipo); }
     const img = $("campo-foto").querySelector("img");
     img.hidden = true; img.removeAttribute("src");
     $("campo-foto").classList.remove("con-foto");
@@ -455,11 +476,19 @@
     return [e.nombre, e.nombre.replace(/\s*\(.*?\)\s*/g, " "), entre && entre[1], e.cientifico].filter(Boolean).map(normalizar);
   }
 
-  function especiesSugeridas() {
+  const tipoElegido = () => formSubir.tipo.value || "";
+  function marcarTipo(tipo) {
+    const opcion = formSubir.querySelector(`input[name="tipo"][value="${tipo}"]`);
+    if (opcion && !opcion.checked) { opcion.checked = true; actualizarEspeciesForm(); }
+  }
+
+  /** Especies de la región primero y luego el resto; con `soloDelTipo`, solo Flora, Fauna o Fungi según lo elegido. */
+  function especiesSugeridas(soloDelTipo = true) {
     const r = regionPorId(formSubir.region.value);
     const deLaRegion = r ? especiesDe(r) : [];
     const resto = todasLasEspecies().filter((e) => !deLaRegion.some((x) => x.cientifico === e.cientifico));
-    return [...deLaRegion, ...resto];
+    const todas = [...deLaRegion, ...resto];
+    return soloDelTipo && tipoElegido() ? todas.filter((e) => e.tipo === tipoElegido()) : todas;
   }
 
   function actualizarEspeciesForm() {
@@ -471,7 +500,8 @@
   function especieElegida() {
     const escrito = normalizar(formSubir.especie.value || "");
     if (escrito.length < 2) return null;
-    return especiesSugeridas().find((e) => nombresDe(e).includes(escrito)) || null;
+    // Se busca en todas las especies: si escribe "huemul" con Flora marcado, igual lo reconoce
+    return especiesSugeridas(false).find((e) => nombresDe(e).includes(escrito)) || null;
   }
 
   function actualizarPistaEspecie() {
@@ -503,9 +533,13 @@
     if (mapaSubir && c) mapaSubir.setView(c, 8);
   });
   formSubir.especie.addEventListener("input", () => {
+    const e = especieElegida();
+    if (e) marcarTipo(e.tipo);  // al reconocer la especie, se marca Flora/Fauna/Fungi sola
     actualizarPistaEspecie();
     actualizarNotaUbicacion();
   });
+  formSubir.querySelectorAll('input[name="tipo"]').forEach((r) =>
+    r.addEventListener("change", actualizarEspeciesForm));
   formSubir.archivo.addEventListener("change", () => {
     const file = formSubir.archivo.files[0];
     const img = $("campo-foto").querySelector("img");
@@ -572,6 +606,7 @@
       const redondear = (x) => Math.round(x * 10 ** d) / 10 ** d;
       const { error } = await sb.from("fotos").insert({
         region: formSubir.region.value,
+        tipo: tipoElegido(),
         especie_cientifico: e ? e.cientifico : null,
         especie_nombre: e ? e.nombre : formSubir.especie.value.trim(),
         lugar: formSubir.lugar.value.trim(),
@@ -602,6 +637,7 @@
   }
 
   pintarChips();
+  pintarFiltroTipo();
   pintarFiltroEspecie();
   pintarPestanas();
 

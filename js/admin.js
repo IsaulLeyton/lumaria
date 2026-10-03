@@ -56,6 +56,7 @@
       <article class="mod-item" data-id="${f.id}">
         <button type="button" class="mod-img" data-ampliar="${_esc(urls[i] || "")}" style="background-image:url('${_esc(urls[i] || "")}')" aria-label="Ampliar foto"></button>
         <div class="mod-info">
+          ${TIPOS[f.tipo] ? `<span class="estado-mod">${TIPOS[f.tipo].etiqueta}</span>` : ""}
           <b>${_esc(f.especie_nombre)}</b> ${f.especie_cientifico ? `<i>${_esc(f.especie_cientifico)}</i>` : `<span class="estado-mod pendiente">Especie escrita por el usuario</span>`}
           <small>${_esc(nombreRegion(f.region))} · ${_esc(f.lugar)}${f.fecha_foto ? " · " + fechaCorta(f.fecha_foto) : ""}</small>
           <small>Subida por <b>${_esc(f.perfiles ? f.perfiles.nombre : "—")}</b> ${haceTiempo(f.creado)}</small>

@@ -538,6 +538,32 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing:
 .campo-foto-vacio b { color: var(--forest); font-size: 1rem; }
 .campo-foto img { max-height: 280px; width: 100%; object-fit: contain; pointer-events: none; }
 .campo-foto.con-foto .campo-foto-vacio { display: none; }
+.campo-tipo { border: 0; padding: 0; margin: 0; }
+.campo-tipo legend { font-weight: 700; font-size: .88rem; color: var(--ink-2); padding: 0; margin-bottom: 6px; }
+.opciones-tipo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.formulario .opcion-tipo { position: relative; display: block; cursor: pointer; }
+.opcion-tipo input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.opcion-tipo span {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 8px; border-radius: 14px;
+  border: 1.5px solid var(--line); background: var(--card); text-align: center; transition: border-color .15s, background .15s;
+}
+.opcion-tipo b { font-size: 1rem; color: var(--ink); }
+.opcion-tipo small { font-weight: 500; font-size: .78rem; color: var(--muted); }
+.opcion-tipo:hover span { border-color: var(--forest-2); }
+.opcion-tipo input:checked + span { border-color: var(--forest); background: color-mix(in srgb, var(--sprout) 25%, var(--card)); box-shadow: 0 0 0 1px var(--forest); }
+.opcion-tipo input:focus-visible + span { outline: 2.5px solid var(--copihue); outline-offset: 2px; }
+.barra-filtro { justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.filtro-tipo { display: flex; gap: 6px; flex-wrap: wrap; }
+.filtro-tipo button {
+  padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card); cursor: pointer;
+  font-weight: 700; font-size: .85rem; color: var(--ink-2);
+}
+.filtro-tipo button[aria-pressed="true"] { background: var(--forest); border-color: var(--forest); color: #fff; }
+.fc-img { position: relative; }
+.fc-tipo {
+  position: absolute; top: 10px; left: 10px; padding: 4px 10px; border-radius: 999px;
+  background: rgba(255, 253, 248, .92); font-size: .72rem; font-weight: 800; color: var(--forest);
+}
 .pista-especie { font-weight: 500; font-size: .82rem; color: var(--muted); }
 .pista-especie.coincide { color: #23602d; font-weight: 700; }
 .campo-mapa { display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: .88rem; color: var(--ink-2); }

@@ -80,6 +80,12 @@
 
       <div id="panel-fotos">
         <div class="barra-filtro">
+          <div class="filtro-tipo" id="filtro-tipo" role="group" aria-label="Filtrar por tipo">
+            <button type="button" data-tipo="" aria-pressed="true">Todo</button>
+            <button type="button" data-tipo="flora" aria-pressed="false">🌿 Flora</button>
+            <button type="button" data-tipo="fauna" aria-pressed="false">🐾 Fauna</button>
+            <button type="button" data-tipo="fungi" aria-pressed="false">🍄 Fungi</button>
+          </div>
           <label>Especie
             <select id="filtro-especie"><option value="">Todas las especies</option></select>
           </label>
@@ -114,6 +120,15 @@
       <label>Región
         <select name="region" required></select>
       </label>
+
+      <fieldset class="campo-tipo">
+        <legend>¿Qué fotografiaste?</legend>
+        <div class="opciones-tipo">
+          <label class="opcion-tipo"><input type="radio" name="tipo" value="flora" required><span><b>🌿 Flora</b><small>Plantas</small></span></label>
+          <label class="opcion-tipo"><input type="radio" name="tipo" value="fauna"><span><b>🐾 Fauna</b><small>Animales</small></span></label>
+          <label class="opcion-tipo"><input type="radio" name="tipo" value="fungi"><span><b>🍄 Fungi</b><small>Hongos y líquenes</small></span></label>
+        </div>
+      </fieldset>
 
       <label>¿Qué especie es?
         <input name="especie" list="sugerencias-especies" required minlength="2" maxlength="80"

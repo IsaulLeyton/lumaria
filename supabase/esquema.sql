@@ -48,6 +48,7 @@ create table public.fotos (
   id                 bigint generated always as identity primary key,
   usuario_id         uuid not null default auth.uid() references public.perfiles on delete cascade,
   region             text not null check (public.region_valida(region)),
+  tipo               text check (tipo in ('flora', 'fauna', 'fungi')),
   especie_cientifico text check (char_length(especie_cientifico) <= 80),
   especie_nombre     text not null check (char_length(especie_nombre) between 2 and 80),
   lugar              text not null check (char_length(lugar) between 2 and 120),
@@ -115,7 +116,7 @@ revoke insert, update, delete on public.perfiles, public.fotos, public.hilos, pu
   from anon, authenticated;
 
 grant update (nombre) on public.perfiles to authenticated;
-grant insert (region, especie_cientifico, especie_nombre, lugar, lat, lng, fecha_foto, descripcion, ruta)
+grant insert (region, tipo, especie_cientifico, especie_nombre, lugar, lat, lng, fecha_foto, descripcion, ruta)
   on public.fotos to authenticated;
 grant delete on public.fotos to authenticated;
 grant insert (region, titulo, cuerpo) on public.hilos to authenticated;

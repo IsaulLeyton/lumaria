@@ -3,7 +3,7 @@
   "short_name": "Lumaria",
   "description": "Atlas de la Flora, Fauna y Funga nativas de Chile, región por región.",
   "lang": "es-CL",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f5efe3",

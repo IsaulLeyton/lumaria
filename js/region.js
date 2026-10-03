@@ -133,7 +133,7 @@
     });
   }
 
-  /* ---------- Modo ajuste de encuadre (regiones/REGION.html?ajustar) ---------- */
+  /* ---------- Modo ajuste de encuadre (regiones/REGION?ajustar) ---------- */
   const AJUSTE = params.has("ajustar");
   const ajustes = {};
   if (AJUSTE) {
@@ -200,13 +200,13 @@
         ${est}
         ${e.endemica ? `<span class="estado" style="--dot:var(--copihue)">Endémica de Chile</span>` : ""}
         ${e.comunidad ? `<span class="aporte-comunidad">Aporte de la comunidad</span>` : ""}
-        ${e.estado || e.endemica ? `<a class="que-significa" href="glosario.html#${e.estado ? "conservacion" : "endemica"}">¿Qué significa?</a>` : ""}
+        ${e.estado || e.endemica ? `<a class="que-significa" href="glosario#${e.estado ? "conservacion" : "endemica"}">¿Qué significa?</a>` : ""}
       </div>
       <p>${_esc(e.desc)}</p>
       <div id="modal-extra"></div>
       <p class="acciones-contenido">
-        <a href="comunidad.html?region=${r.id}&especie=${encodeURIComponent(e.cientifico)}">Ver fotos de la comunidad →</a>
-        <a href="comunidad.html?region=${r.id}&subir=1">¿La has visto? Sube tu foto</a>
+        <a href="comunidad?region=${r.id}&especie=${encodeURIComponent(e.cientifico)}">Ver fotos de la comunidad →</a>
+        <a href="comunidad?region=${r.id}&subir=1">¿La has visto? Sube tu foto</a>
       </p>`;
     if (typeof modal.showModal === "function") modal.showModal(); else modal.setAttribute("open", "");
 
@@ -272,7 +272,7 @@
   pintar();
 
   /* ---------- Especies aportadas por la comunidad (aprobadas) ---------- */
-  if ($("cta-agregar")) $("cta-agregar").href = `agregar-especie.html?region=${r.id}`;
+  if ($("cta-agregar")) $("cta-agregar").href = `agregar-especie?region=${r.id}`;
   const especiesComunidad = (async () => {
     if (typeof COMUNIDAD_ACTIVA === "undefined" || !COMUNIDAD_ACTIVA) return;
     const { data, error } = await sb.from("especies_propuestas").select(CAMPOS_PROPUESTA)
@@ -288,8 +288,8 @@
   })();
 
   /* ---------- Fotos de la comunidad ---------- */
-  $("cta-subir").href = `comunidad.html?region=${r.id}&subir=1`;
-  $("cta-comunidad").href = `comunidad.html?region=${r.id}`;
+  $("cta-subir").href = `comunidad?region=${r.id}&subir=1`;
+  $("cta-comunidad").href = `comunidad?region=${r.id}`;
   (async () => {
     const grid = $("fotos-comunidad");
     if (typeof COMUNIDAD_ACTIVA === "undefined" || !COMUNIDAD_ACTIVA) {
@@ -306,7 +306,7 @@
     }
     const urls = await urlsFotos(data.map((f) => f.ruta));
     grid.innerHTML = data.map((f, i) => `
-      <a class="foto-comunidad" href="comunidad.html?region=${r.id}" style="--rc:${r.color}">
+      <a class="foto-comunidad" href="comunidad?region=${r.id}" style="--rc:${r.color}">
         <span class="fc-img">${urls[i] ? `<img src="${_esc(urls[i])}" alt="${_esc(f.especie_nombre)}" loading="lazy">` : ""}</span>
         <span class="fc-info"><b>${_esc(f.especie_nombre)}</b><small>${_esc(f.lugar)} · por ${_esc(f.perfiles ? f.perfiles.nombre : "—")}</small></span>
       </a>`).join("");

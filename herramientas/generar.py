@@ -2,7 +2,8 @@
 Lumaria — Generador de páginas para buscadores (SEO)
 
 Lee js/data.js y crea:
-  • regiones/<region>.html  (una página real por región, con su texto ya escrito)
+  • regiones/<region>.html  (una página real por región, con su texto ya escrito;
+    en internet se ve como lumaria.cl/regiones/<region>, sin el .html)
   • sitemap.xml y robots.txt
   • los datos para Google y redes sociales en index.html, comunidad.html y creditos.html
 
@@ -176,7 +177,7 @@ def recortar(texto, largo=158):
 #  Páginas de región
 # ---------------------------------------------------------------
 def url_region(rid):
-    return f"{SITIO}/regiones/{rid}.html"
+    return f"{SITIO}/regiones/{rid}"  # GitHub Pages sirve regiones/{rid}.html sin la extensión
 
 
 def tarjeta_estatica(x):
@@ -292,8 +293,8 @@ def generar_regiones(regiones):
             "H2": e(f"Especies nativas de la {oficial}"),
             "ESPECIES": "".join(tarjeta_estatica(x) for x in especies),
             "NAV": (
-                f'<a class="nav-region" href="regiones/{ant["id"]}.html"><small>← Hacia el norte</small><b>{e(ant["nombre"])}</b></a>'
-                f'<a class="nav-region sig" href="regiones/{sig["id"]}.html"><small>Hacia el sur →</small><b>{e(sig["nombre"])}</b></a>'
+                f'<a class="nav-region" href="regiones/{ant["id"]}"><small>← Hacia el norte</small><b>{e(ant["nombre"])}</b></a>'
+                f'<a class="nav-region sig" href="regiones/{sig["id"]}"><small>Hacia el sur →</small><b>{e(sig["nombre"])}</b></a>'
             ),
             "JSONLD": json_ld_region(r, oficial, titulo, descripcion, especies),
         }
@@ -311,7 +312,7 @@ def generar_regiones(regiones):
 #  Datos SEO en las páginas principales (entre marcadores)
 # ---------------------------------------------------------------
 def bloque_seo(ruta, titulo, descripcion, extra_jsonld=None):
-    url = f"{SITIO}/{ruta}" if ruta != "index.html" else f"{SITIO}/"
+    url = f"{SITIO}/{ruta.removesuffix('.html')}" if ruta != "index.html" else f"{SITIO}/"
     lineas = [
         f'<link rel="canonical" href="{url}">',
         '<meta property="og:type" content="website">',
@@ -388,7 +389,7 @@ def actualizar_paginas(regiones):
         texto = reemplazar_entre(texto, "SEO", bloque_seo(archivo, titulo, descripcion, jsonld), archivo)
         if archivo == "index.html":
             tarjetas = "".join(
-                f'<a class="tarjeta-region" href="regiones/{r["id"]}.html" style="--rc:{e(r["color"])}">'
+                f'<a class="tarjeta-region" href="regiones/{r["id"]}" style="--rc:{e(r["color"])}">'
                 f'<span class="num">REGIÓN {e(r["num"])}</span><h3>{e(r["nombre"])}</h3><p>{e(r["lema"])}</p></a>'
                 for r in regiones
             )
@@ -401,8 +402,8 @@ def actualizar_paginas(regiones):
 #  sitemap.xml y robots.txt
 # ---------------------------------------------------------------
 def generar_sitemap(regiones):
-    urls = [(f"{SITIO}/", "1.0"), (f"{SITIO}/glosario.html", "0.8"), (f"{SITIO}/comunidad.html", "0.8"),
-            (f"{SITIO}/creditos.html", "0.3"), (f"{SITIO}/privacidad.html", "0.3")]
+    urls = [(f"{SITIO}/", "1.0"), (f"{SITIO}/glosario", "0.8"), (f"{SITIO}/comunidad", "0.8"),
+            (f"{SITIO}/creditos", "0.3"), (f"{SITIO}/privacidad", "0.3")]
     urls += [(url_region(r["id"]), "0.9") for r in regiones]
     cuerpo = "\n".join(
         f"  <url>\n    <loc>{u}</loc>\n    <lastmod>{HOY}</lastmod>\n    <priority>{p}</priority>\n  </url>"
@@ -417,7 +418,7 @@ def generar_sitemap(regiones):
     (RAIZ / "robots.txt").write_text(
         "User-agent: *\n"
         "Allow: /\n"
-        "Disallow: /admin.html\n"
+        "Disallow: /admin\n"
         "Disallow: /herramientas/\n"
         "Disallow: /supabase/\n"
         f"\nSitemap: {SITIO}/sitemap.xml\n",

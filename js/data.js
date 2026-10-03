@@ -578,7 +578,7 @@ REGIONES.forEach((r) => { r.fungi = FUNGI[r.id] || []; });
 /* =========================================================
    Encuadre de las fotos en tarjetas y miniaturas.
    "X% Y%": punto que debe quedar visible (0% 0% = arriba a la izquierda).
-   Para ajustar una foto: abre regiones/REGION.html?ajustar,
+   Para ajustar una foto: abre regiones/REGION?ajustar,
    haz clic sobre la especie y pega aquí la línea que aparece.
    ========================================================= */
 const FOCOS = {

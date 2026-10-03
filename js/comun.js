@@ -2,7 +2,18 @@
    Lumaria — utilidades compartidas
    ========================================================= */
 
-const AMENAZADAS = ["Vulnerable", "En peligro", "En peligro crítico", "Extinta en estado silvestre"];
+/* Direcciones limpias: si se entra con un enlace antiguo (glosario.html, index.html),
+   se quita el .html de la barra de direcciones sin recargar la página. */
+(function () {
+  if (location.protocol === "file:") return;
+  const ruta = location.pathname;
+  let limpia = null;
+  if (/\/index\.html$/.test(ruta)) limpia = ruta.replace(/index\.html$/, "");
+  else if (/\.html$/.test(ruta) && !/\/404\.html$/.test(ruta)) limpia = ruta.replace(/\.html$/, "");
+  if (limpia !== null) history.replaceState(history.state, "", limpia + location.search + location.hash);
+})();
+
+const AMENAZADAS =["Vulnerable", "En peligro", "En peligro crítico", "Extinta en estado silvestre"];
 
 function claseEstado(estado) {
   if (!estado) return "";
@@ -36,7 +47,7 @@ function focoDe(cientifico) {
 
 /** Dirección de la página de una región (páginas generadas por herramientas/generar.py). */
 function urlRegion(id, extra = "") {
-  return `regiones/${id}.html${extra ? "?" + extra : ""}`;
+  return `regiones/${id}${extra ? "?" + extra : ""}`;
 }
 
 function regionPorId(id) {

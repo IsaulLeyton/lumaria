@@ -35,7 +35,7 @@
     if (estado.especie) p.set("especie", estado.especie);
     if (estado.tipo) p.set("tipo", estado.tipo);
     if (estado.mias) p.set("mias", "1");
-    history.replaceState(null, "", "comunidad.html" + (p.toString() ? "?" + p : ""));
+    history.replaceState(null, "", "comunidad" + (p.toString() ? "?" + p : ""));
   }
 
   const EMOJI_TIPO = { flora: "🌿", fauna: "🐾", fungi: "🍄" };

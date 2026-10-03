@@ -199,8 +199,8 @@ function abrirEntrar(motivo = "") {
       <h2>Entrar a la comunidad</h2>
       <p class="ayuda">${_esc(motivo || "Escribe tu correo y te enviaremos un enlace para entrar. No necesitas contraseña.")}</p>
       <label>Correo electrónico<input type="email" name="email" required autocomplete="email" placeholder="tucorreo@ejemplo.cl"></label>
-      <p class="ayuda">Al entrar aceptas las <a href="privacidad.html#normas" target="_blank">normas de la comunidad</a>
-        y la <a href="privacidad.html" target="_blank">política de privacidad</a>. Tu correo nunca se muestra a otras personas.</p>
+      <p class="ayuda">Al entrar aceptas las <a href="privacidad#normas" target="_blank">normas de la comunidad</a>
+        y la <a href="privacidad" target="_blank">política de privacidad</a>. Tu correo nunca se muestra a otras personas.</p>
       <div class="acciones"><button class="boton" type="submit">Enviarme el enlace</button></div>
     </form>`);
   d.querySelector("form").onsubmit = async (ev) => {
@@ -268,8 +268,8 @@ function pintarCuenta() {
       <div class="menu-cuenta-lista">
         <small>${_esc(_perfil.email || "")}</small>
         <button type="button" data-accion="nombre">Cambiar mi nombre</button>
-        <a href="comunidad.html?mias=1">Mis fotos</a>
-        ${esAdmin() ? `<a href="admin.html">Panel de moderación</a>` : ""}
+        <a href="comunidad?mias=1">Mis fotos</a>
+        ${esAdmin() ? `<a href="admin">Panel de moderación</a>` : ""}
         <button type="button" data-accion="salir">Salir</button>
       </div>
     </details>`;

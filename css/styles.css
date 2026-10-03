@@ -86,7 +86,12 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing:
 .titulo-portada em { font-style: italic; font-weight: 400; color: var(--copihue); }
 .bajada { font-size: 1.12rem; color: var(--ink-2); max-width: 46ch; margin: 0 0 28px; }
 
-.columna-info { position: sticky; top: 92px; }
+/* El título y el buscador bajan normal; solo la tarjeta de vista previa acompaña al mapa
+   (la columna se estira a la altura del mapa para que la tarjeta tenga espacio donde quedarse) */
+.columna-info { align-self: stretch; }
+@media (min-height: 640px) {
+  .columna-info .preview { position: sticky; top: 92px; }
+}
 
 /* Buscador */
 .buscador { position: relative; max-width: 480px; margin-bottom: 26px; }
@@ -873,7 +878,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing:
 /* ---------- Responsivo ---------- */
 @media (max-width: 960px) {
   .portada-grid { grid-template-columns: 1fr; gap: 28px; }
-  .columna-info { position: static; }
+  .columna-info { align-self: auto; }
   .columna-info .preview { display: none; }
   .mapa-marco { max-width: 560px; margin-inline: auto; }
   .cifras { grid-template-columns: repeat(2, 1fr); }

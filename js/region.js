@@ -47,6 +47,7 @@
     { id: "fungi", txt: "Funga", ico: ICONOS.hongo, fn: (e) => e.tipo === "fungi" },
     { id: "endemicas", txt: "Endémicas", ico: ICONOS.estrella, fn: (e) => e.endemica },
     { id: "amenazadas", txt: "Amenazadas", fn: (e) => AMENAZADAS.includes(e.estado) },
+    { id: "exoticas", txt: "Exóticas", fn: (e) => e.origen === "exotica", soloSiHay: true },
     { id: "comunidad", txt: "Aportes de la comunidad", fn: (e) => !!e.comunidad, soloSiHay: true }
   ];
   let filtroActual = "todas";
@@ -75,7 +76,7 @@
       <button class="especie" data-sci="${_esc(e.cientifico)}" style="animation-delay:${i * 50}ms">
         <div class="foto">
           <span class="tipo">${iconoTipo(e.tipo)}${TIPOS[e.tipo].etiqueta}${e.grupo ? " · " + _esc(e.grupo) : ""}</span>
-          ${e.endemica ? `<span class="endemica">${ICONOS.estrella}Endémica</span>` : ""}
+          ${etiquetaOrigen(e.origen || (e.endemica ? "endemica" : ""))}
           <div class="foto-vacia cargando">${iconoTipo(e.tipo)}</div>
         </div>
         <div class="cuerpo">
@@ -199,8 +200,10 @@
       <div class="etiquetas-modal">
         ${est}
         ${e.endemica ? `<span class="estado" style="--dot:var(--copihue)">Endémica de Chile</span>` : ""}
+        ${e.origen === "exotica" ? `<span class="estado" style="--dot:#8a6a4a">Especie exótica</span>` : ""}
         ${e.comunidad ? `<span class="aporte-comunidad">Aporte de la comunidad</span>` : ""}
-        ${e.estado || e.endemica ? `<a class="que-significa" href="glosario#${e.estado ? "conservacion" : "endemica"}">¿Qué significa?</a>` : ""}
+        ${e.estado || e.endemica || e.origen === "exotica"
+          ? `<a class="que-significa" href="glosario#${e.estado ? "conservacion" : e.origen === "exotica" ? "introducida" : "endemica"}">¿Qué significa?</a>` : ""}
       </div>
       <p>${_esc(e.desc)}</p>
       <div id="modal-extra"></div>

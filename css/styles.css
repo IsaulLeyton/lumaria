@@ -369,6 +369,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing:
   background: var(--copihue); color: #fff;
 }
 .especie .endemica svg { width: 11px; height: 11px; }
+.endemica.exotica { background: #8a6a4a; }
 .especie .cuerpo { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .especie h3 { font-size: 1.32rem; }
 .especie .cientifico { font-family: var(--font-display); font-style: italic; color: var(--muted); font-size: .98rem; }
@@ -384,6 +385,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing:
 .estado.en { --dot: #e06b26; }
 .estado.cr { --dot: #c3283d; }
 .estado.ew { --dot: #5a2a6b; }
+.estado.ne, .estado.dd { --dot: #b8bdb9; }
 
 .navegacion-regiones { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 64px; }
 .nav-region {
@@ -779,7 +781,10 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing:
 .g-cuerpo h3 { font-size: 1.35rem; color: var(--forest); margin-bottom: 6px; }
 .g-cuerpo p { margin: 0 0 8px; color: var(--ink-2); font-size: .95rem; }
 .g-ejemplo { font-size: .88rem !important; color: var(--muted) !important; }
-.g-etiqueta { position: static; display: inline-flex; vertical-align: middle; }
+.g-etiqueta {
+  position: static; display: inline-flex; vertical-align: middle; padding: 2px 9px; border-radius: 999px;
+  font-size: .75rem; font-weight: 800; background: var(--copihue); color: #fff;
+}
 
 .g-foto { position: relative; margin: 0; overflow: hidden; aspect-ratio: 4 / 3; background: var(--bg-2); }
 .g-foto img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s; }
@@ -811,6 +816,10 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing:
 .estado-fila h3 .estado { font-family: var(--font-body); font-size: .95rem; padding: 6px 14px 6px 12px; }
 .estado-fila p { margin: 0 0 6px; color: var(--ink-2); font-size: .95rem; }
 
+.otras-categorias { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 18px; }
+.otras-categorias > div { background: var(--card); border: 1px dashed var(--line); border-radius: 18px; padding: 16px 18px; }
+.otras-categorias .estado { font-size: .9rem; padding: 6px 14px 6px 12px; }
+.otras-categorias p { margin: 10px 0 0; color: var(--ink-2); font-size: .93rem; }
 .g-nombres { display: grid; grid-template-columns: 300px 1fr; gap: 28px; align-items: center; }
 .g-nombres .g-foto { border-radius: 22px; }
 .g-nombres p { color: var(--ink-2); }

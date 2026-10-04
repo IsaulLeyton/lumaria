@@ -28,7 +28,7 @@
       <article class="especie previa" style="--rc:${r ? r.color : "var(--forest)"}">
         <div class="foto">
           <span class="tipo">${etiquetaTipo}</span>
-          ${valor("endemica") === "true" ? `<span class="endemica">${ICONOS.estrella}Endémica</span>` : ""}
+          ${etiquetaOrigen(valor("origen"))}
           ${fotoPrevia ? `<img class="cargada" src="${fotoPrevia}" alt="">` : `<div class="foto-vacia">${tipo ? iconoTipo(tipo) : ICONOS.hoja}</div>`}
         </div>
         <div class="cuerpo">
@@ -112,7 +112,8 @@
         cientifico: valor("cientifico"),
         descripcion: valor("descripcion"),
         estado_conservacion: valor("estado_conservacion") || null,
-        endemica: valor("endemica") === "" ? null : valor("endemica") === "true",
+        origen: valor("origen") || null,
+        endemica: valor("origen") ? valor("origen") === "endemica" : null,
         fuente: valor("fuente") || null,
         lugar_foto: valor("lugar_foto") || null,
         ruta_foto: ruta

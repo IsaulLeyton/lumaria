@@ -13,11 +13,12 @@
   if (limpia !== null) history.replaceState(history.state, "", limpia + location.search + location.hash);
 })();
 
-const AMENAZADAS =["Vulnerable", "En peligro", "En peligro crítico", "Extinta en estado silvestre"];
+const AMENAZADAS = ["Vulnerable", "En peligro", "En peligro crítico", "Extinta en estado silvestre"];
 
 function claseEstado(estado) {
   if (!estado) return "";
   return {
+    "No evaluado": "ne",
     "Preocupación menor": "lc",
     "Casi amenazada": "nt",
     "Vulnerable": "vu",
@@ -25,6 +26,13 @@ function claseEstado(estado) {
     "En peligro crítico": "cr",
     "Extinta en estado silvestre": "ew"
   }[estado] || "";
+}
+
+/** Etiqueta de origen sobre la foto: «Endémica» o «Exótica» (las nativas no llevan etiqueta). */
+function etiquetaOrigen(origen) {
+  if (origen === "endemica") return `<span class="endemica">${ICONOS.estrella}Endémica</span>`;
+  if (origen === "exotica") return `<span class="endemica exotica">Exótica</span>`;
+  return "";
 }
 
 /* ---------- Flora, Fauna y Funga (el código interno "fungi" se mantiene) ---------- */

@@ -48,7 +48,7 @@ NOMBRE_OFICIAL = {
 TIPOS = {"flora": "Flora", "fauna": "Fauna", "fungi": "Funga"}
 AMENAZADAS = {"Vulnerable", "En peligro", "En peligro crítico", "Extinta en estado silvestre"}
 CLASE_ESTADO = {
-    "Preocupación menor": "lc", "Casi amenazada": "nt", "Vulnerable": "vu",
+    "No evaluado": "ne", "Preocupación menor": "lc", "Casi amenazada": "nt", "Vulnerable": "vu",
     "En peligro": "en", "En peligro crítico": "cr", "Extinta en estado silvestre": "ew",
 }
 
@@ -141,7 +141,7 @@ def agregar_especies_comunidad(regiones):
         print("  · comunidad no conectada: se omiten las especies aportadas")
         return
     consulta = (f"{url.group(1)}/rest/v1/especies_propuestas?estado=eq.aprobada&order=creado"
-                "&select=region,tipo,grupo,nombre,cientifico,descripcion,estado_conservacion,endemica")
+                "&select=region,tipo,grupo,nombre,cientifico,descripcion,estado_conservacion,endemica,origen")
     pedido = urllib.request.Request(consulta, headers={"apikey": clave.group(1), "Authorization": f"Bearer {clave.group(1)}"})
     try:
         with urllib.request.urlopen(pedido, timeout=20) as resp:
@@ -157,7 +157,9 @@ def agregar_especies_comunidad(regiones):
             continue
         r["comunidad"].append({
             "nombre": f["nombre"], "cientifico": f["cientifico"], "desc": f["descripcion"],
-            "estado": f.get("estado_conservacion"), "endemica": bool(f.get("endemica")),
+            "estado": f.get("estado_conservacion"),
+            "endemica": f.get("origen") == "endemica" if f.get("origen") else bool(f.get("endemica")),
+            "exotica": f.get("origen") == "exotica",
             "grupo": f.get("grupo"), "tipo": f["tipo"], "aporte": True,
         })
         n += 1
@@ -184,7 +186,8 @@ def tarjeta_estatica(x):
     estado = (f'<span class="estado {CLASE_ESTADO.get(x["estado"], "")}">{e(x["estado"])}</span>'
               if x.get("estado") else "")
     grupo = f' · {e(x["grupo"])}' if x.get("grupo") else ""
-    endemica = '<span class="endemica">Endémica</span>' if x.get("endemica") else ""
+    endemica = ('<span class="endemica">Endémica</span>' if x.get("endemica")
+                else '<span class="endemica exotica">Exótica</span>' if x.get("exotica") else "")
     return f"""
           <article class="especie" data-sci="{e(x["cientifico"])}">
             <div class="foto"><span class="tipo">{TIPOS[x["tipo"]]}{grupo}</span>{endemica}<div class="foto-vacia"></div></div>

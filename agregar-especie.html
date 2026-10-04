@@ -99,6 +99,7 @@
             <label>Estado de conservación
               <select name="estado_conservacion">
                 <option value="">No sé</option>
+                <option>No evaluado</option>
                 <option>Preocupación menor</option>
                 <option>Casi amenazada</option>
                 <option>Vulnerable</option>
@@ -106,13 +107,16 @@
                 <option>En peligro crítico</option>
                 <option>Extinta en estado silvestre</option>
               </select>
+              <small class="pista-especie"><a href="glosario#conservacion" target="_blank">¿Qué significa cada estado?</a></small>
             </label>
-            <label>¿Es endémica de Chile?
-              <select name="endemica">
+            <label>¿Cuál es su origen?
+              <select name="origen">
                 <option value="">No sé</option>
-                <option value="true">Sí, solo vive en Chile</option>
-                <option value="false">No, también vive en otros países</option>
+                <option value="nativa">Nativa: vive naturalmente en Chile (y quizás en otros países)</option>
+                <option value="endemica">Endémica: solo vive naturalmente en Chile</option>
+                <option value="exotica">Exótica: fue traída a Chile por las personas</option>
               </select>
+              <small class="pista-especie"><a href="glosario#origen" target="_blank">¿Cuál es la diferencia?</a></small>
             </label>
           </div>
 

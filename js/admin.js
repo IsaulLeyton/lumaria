@@ -46,8 +46,11 @@
   }
 
   /* ---------- Especies propuestas ---------- */
-  const ESTADOS_CONSERVACION = ["Preocupación menor", "Casi amenazada", "Vulnerable", "En peligro",
+  const ESTADOS_CONSERVACION = ["No evaluado", "Preocupación menor", "Casi amenazada", "Vulnerable", "En peligro",
     "En peligro crítico", "Extinta en estado silvestre"];
+  const ORIGENES = [["", "No se sabe"], ["nativa", "Nativa"], ["endemica", "Endémica"], ["exotica", "Exótica"]];
+  // Propuestas antiguas solo tenían «endemica» (sí/no)
+  const origenDe = (p) => p.origen || (p.endemica === true ? "endemica" : p.endemica === false ? "nativa" : "");
   const opciones = (lista, actual) => lista.map(([v, t]) =>
     `<option value="${_esc(v)}" ${String(actual ?? "") === v ? "selected" : ""}>${_esc(t)}</option>`).join("");
   const enlaceSeguro = (texto) => /^https?:\/\//i.test(texto)
@@ -79,7 +82,7 @@
             <label>Nombre científico<input name="cientifico" maxlength="80" value="${_esc(p.cientifico)}"></label>
             <label class="ancho">Descripción<textarea name="descripcion" rows="3" maxlength="300">${_esc(p.descripcion)}</textarea></label>
             <label>Conservación<select name="estado_conservacion">${opciones([["", "Sin dato"], ...ESTADOS_CONSERVACION.map((x) => [x, x])], p.estado_conservacion || "")}</select></label>
-            <label>¿Endémica?<select name="endemica">${opciones([["", "No se sabe"], ["true", "Sí"], ["false", "No"]], p.endemica === null ? "" : String(p.endemica))}</select></label>
+            <label>Origen<select name="origen">${opciones(ORIGENES, origenDe(p))}</select></label>
           </div>
           <small><b>Fuente:</b> ${p.fuente ? enlaceSeguro(p.fuente) : "<i>no indicó</i>"}</small>
           ${p.lugar_foto ? `<small><b>Foto tomada en:</b> ${_esc(p.lugar_foto)}</small>` : ""}
@@ -107,7 +110,7 @@
         tipo: campo("tipo"), grupo: campo("tipo") === "fungi" ? campo("grupo") : "",
         nombre: campo("nombre"), cientifico: campo("cientifico"), descripcion: campo("descripcion"),
         estado_conservacion: campo("estado_conservacion"),
-        endemica: campo("endemica") === "" ? null : campo("endemica") === "true"
+        origen: campo("origen")
       };
       if (cambios.nombre.length < 2 || cambios.cientifico.length < 3 || cambios.descripcion.length < 20) {
         avisar("Revisa los textos: nombre, nombre científico y descripción (mínimo 20 letras) son obligatorios.", "error");

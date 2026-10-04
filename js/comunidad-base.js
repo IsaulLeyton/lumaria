@@ -107,7 +107,7 @@ async function urlsFotos(rutas, bucket = "fotos") {
 }
 
 /* ---------- Especies aportadas por la comunidad ---------- */
-const CAMPOS_PROPUESTA = "id, region, tipo, grupo, nombre, cientifico, descripcion, estado_conservacion, endemica, ruta_foto, perfiles(nombre)";
+const CAMPOS_PROPUESTA = "id, region, tipo, grupo, nombre, cientifico, descripcion, estado_conservacion, endemica, origen, ruta_foto, perfiles(nombre)";
 
 /** Convierte una especie propuesta (fila de Supabase) al mismo formato que las especies de data.js. */
 function especieDePropuesta(p) {
@@ -116,7 +116,9 @@ function especieDePropuesta(p) {
     cientifico: p.cientifico,
     desc: p.descripcion,
     estado: p.estado_conservacion || null,
-    endemica: !!p.endemica,
+    // «origen» es nuevo; las propuestas antiguas solo tenían «endemica»
+    origen: p.origen || (p.endemica === true ? "endemica" : p.endemica === false ? "nativa" : null),
+    endemica: p.origen ? p.origen === "endemica" : !!p.endemica,
     tipo: p.tipo,
     grupo: p.grupo || undefined,
     comunidad: { id: p.id, autor: p.perfiles ? p.perfiles.nombre : "la comunidad", ruta: p.ruta_foto }

@@ -10,5 +10,5 @@ const LUMARIA_CONFIG = {
   supabaseAnonKey: "sb_publishable_lDE5mvpTcz-sf4ToBgPK2g_aKjUd5Rn",  // clave publicable (pública)
   // Cloudflare Turnstile (verificación anti-robots al entrar). La «Site Key» es pública.
   // La «Secret Key» NUNCA va aquí: se pega en Supabase → Authentication → Attack Protection.
-  turnstileSiteKey: ""
+  turnstileSiteKey: "0x4AAAAAAFO2ajZnOPI53h4e"
 };

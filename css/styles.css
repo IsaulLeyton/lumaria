@@ -573,6 +573,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing:
 }
 .pista-especie { font-weight: 500; font-size: .82rem; color: var(--muted); }
 .pista-especie.coincide { color: #23602d; font-weight: 700; }
+.verificacion-robot { min-height: 65px; }
 .campo-mapa { display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: .88rem; color: var(--ink-2); }
 .campo-mapa small { font-weight: 500; }
 .mapa-leaflet { height: 240px; border-radius: 14px; border: 1.5px solid var(--line); z-index: 0; }

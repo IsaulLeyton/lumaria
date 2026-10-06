@@ -18,8 +18,12 @@ async function cargarSesion() {
   if (!sb) return null;
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { _perfil = null; return null; }
-  const { data } = await sb.from("perfiles").select("*").eq("id", session.user.id).maybeSingle();
-  _perfil = data ? { ...data, email: session.user.email } : null;
+  // El público solo puede leer el nombre de los perfiles; el perfil propio completo
+  // (rol, bloqueo) se pide con mi_perfil(). Si esa función aún no existe, se usa la consulta antigua.
+  let { data, error } = await sb.rpc("mi_perfil");
+  let perfil = Array.isArray(data) ? data[0] : data;
+  if (error) ({ data: perfil } = await sb.from("perfiles").select("*").eq("id", session.user.id).maybeSingle());
+  _perfil = perfil ? { ...perfil, email: session.user.email } : null;
   return _perfil;
 }
 
@@ -203,19 +207,40 @@ function abrirEntrar(motivo = "") {
       <label>Correo electrónico<input type="email" name="email" required autocomplete="email" placeholder="tucorreo@ejemplo.cl"></label>
       <p class="ayuda">Al entrar aceptas las <a href="privacidad#normas" target="_blank">normas de la comunidad</a>
         y la <a href="privacidad" target="_blank">política de privacidad</a>. Tu correo nunca se muestra a otras personas.</p>
+      ${LUMARIA_CONFIG.turnstileSiteKey ? `<div class="verificacion-robot" id="turnstile-entrar"></div>` : ""}
       <div class="acciones"><button class="boton" type="submit">Enviarme el enlace</button></div>
     </form>`);
+
+  // Verificación anti-robots (Cloudflare Turnstile), solo si está configurada
+  let tokenRobot = null, widget = null;
+  if (LUMARIA_CONFIG.turnstileSiteKey) {
+    cargarTurnstile().then(() => {
+      widget = window.turnstile.render("#turnstile-entrar", {
+        sitekey: LUMARIA_CONFIG.turnstileSiteKey,
+        language: "es",
+        callback: (t) => { tokenRobot = t; },
+        "expired-callback": () => { tokenRobot = null; },
+        "error-callback": () => { tokenRobot = null; }
+      });
+    }).catch(() => avisar("No pudimos cargar la verificación anti-robots. Recarga la página.", "error"));
+  }
+
   d.querySelector("form").onsubmit = async (ev) => {
     ev.preventDefault();
+    if (LUMARIA_CONFIG.turnstileSiteKey && !tokenRobot) {
+      avisar("Espera un momento a que termine la verificación anti-robots.", "error");
+      return;
+    }
     const btn = d.querySelector("button[type=submit]");
     btn.disabled = true; btn.textContent = "Enviando…";
     const email = d.querySelector("[name=email]").value.trim();
-    const { error } = await sb.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: location.origin + location.pathname + location.search }
-    });
+    const opciones = { emailRedirectTo: location.origin + location.pathname + location.search };
+    if (tokenRobot) opciones.captchaToken = tokenRobot;
+    const { error } = await sb.auth.signInWithOtp({ email, options: opciones });
     if (error) {
       btn.disabled = false; btn.textContent = "Enviarme el enlace";
+      // cada verificación sirve una sola vez: se pide una nueva
+      if (widget !== null && window.turnstile) { window.turnstile.reset(widget); tokenRobot = null; }
       avisar(mensajeError(error), "error");
       return;
     }
@@ -223,9 +248,23 @@ function abrirEntrar(motivo = "") {
       <h2>Revisa tu correo</h2>
       <p class="ayuda">Te enviamos un enlace a <b>${_esc(email)}</b>. Ábrelo en este mismo navegador para entrar.
       Si no llega en unos minutos, revisa la carpeta de spam.</p>
-      <div class="acciones"><button class="boton" type="button" onclick="this.closest('dialog').close()">Entendido</button></div>`;
+      <div class="acciones"><button class="boton" type="button" data-cerrar-dialogo>Entendido</button></div>`;
   };
   d.showModal();
+}
+
+/** Carga una sola vez el script de Cloudflare Turnstile. */
+let _turnstile = null;
+function cargarTurnstile() {
+  if (!_turnstile) _turnstile = new Promise((ok, falla) => {
+    const s = document.createElement("script");
+    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    s.async = true;
+    s.onload = ok;
+    s.onerror = falla;
+    document.head.appendChild(s);
+  });
+  return _turnstile;
 }
 
 /** Devuelve true si hay sesión; si no, abre el diálogo para entrar. */
@@ -295,3 +334,9 @@ async function reportar(tipo, id) {
 }
 
 document.addEventListener("DOMContentLoaded", () => { if (sb) sesionLista(); });
+
+// Botones que cierran el diálogo donde están (sin JavaScript escrito dentro del HTML)
+document.addEventListener("click", (ev) => {
+  const b = ev.target.closest("[data-cerrar-dialogo]");
+  if (b) b.closest("dialog").close();
+});

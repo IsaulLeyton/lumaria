@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Seguridad: qué sitios pueden cargar código, imágenes y datos en esta página -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://upload.wikimedia.org https://thumb.wikimedia.org https://inaturalist-open-data.s3.amazonaws.com https://oexvgktopvhaibgwvukw.supabase.co https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com; connect-src 'self' https://oexvgktopvhaibgwvukw.supabase.co wss://oexvgktopvhaibgwvukw.supabase.co https://es.wikipedia.org https://en.wikipedia.org https://commons.wikimedia.org; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Moderación · Lumaria</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='19' fill='%231f4a38'/%3E%3Cpath d='M12 29c0-9 5-15 16-17-1 11-7 16-16 17Z' fill='%23a8cf7a'/%3E%3Ccircle cx='27.5' cy='27' r='2.6' fill='%23c3283d'/%3E%3C/svg%3E">
@@ -53,11 +56,12 @@
   </main>
 
   <dialog class="modal" id="dlg-ampliar" aria-label="Foto ampliada">
-    <button class="modal-cerrar" type="button" aria-label="Cerrar" onclick="this.closest('dialog').close()">×</button>
+    <button class="modal-cerrar" type="button" aria-label="Cerrar" data-cerrar-dialogo>×</button>
     <div class="modal-foto"><img alt=""></div>
   </dialog>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"
+    integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/comun.js"></script>

@@ -3,18 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Seguridad: qué sitios pueden cargar código, imágenes y datos en esta página -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://upload.wikimedia.org https://thumb.wikimedia.org https://inaturalist-open-data.s3.amazonaws.com https://oexvgktopvhaibgwvukw.supabase.co https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com; connect-src 'self' https://oexvgktopvhaibgwvukw.supabase.co wss://oexvgktopvhaibgwvukw.supabase.co https://es.wikipedia.org https://en.wikipedia.org https://commons.wikimedia.org; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="robots" content="noindex">
   <title>Lumaria</title>
   <!-- Dirección antigua (region.html?id=maule): redirige a la página nueva (regiones/maule) -->
-  <script>
-    (function () {
-      var p = new URLSearchParams(location.search);
-      var id = (p.get("id") || "").replace(/[^a-z]/g, "");
-      p.delete("id");
-      var resto = p.toString();
-      location.replace(id ? "regiones/" + id + (resto ? "?" + resto : "") : "./");
-    })();
-  </script>
+  <script src="js/redireccion.js"></script>
   <noscript><meta http-equiv="refresh" content="0; url=./"></noscript>
 </head>
 <body>

@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Seguridad: qué sitios pueden cargar código, imágenes y datos en esta página -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://upload.wikimedia.org https://thumb.wikimedia.org https://inaturalist-open-data.s3.amazonaws.com https://oexvgktopvhaibgwvukw.supabase.co https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com; connect-src 'self' https://oexvgktopvhaibgwvukw.supabase.co wss://oexvgktopvhaibgwvukw.supabase.co https://es.wikipedia.org https://en.wikipedia.org https://commons.wikimedia.org; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <base href="../">
   <title>Flora, Fauna y Funga nativas de la Región de Los Lagos | Lumaria</title>
   <meta name="description" content="11 especies nativas de la Región de Los Lagos: zorro de Darwin, alerce, ballena azul, pan de indio y más. Flora, Fauna y Funga con fotos, estado de…">
@@ -386,7 +389,8 @@
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"
+    integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/comun.js"></script>

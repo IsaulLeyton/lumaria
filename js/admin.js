@@ -5,6 +5,12 @@
    ========================================================= */
 
 (function () {
+  // El panel no funciona dentro de un marco de otro sitio (protección contra «clickjacking»)
+  if (window.top !== window.self) {
+    document.body.innerHTML = "";
+    window.top.location = window.self.location.href;
+    return;
+  }
   const $ = (id) => document.getElementById(id);
   const nombreRegion = (id) => (regionPorId(id) || {}).nombre || id;
   let tab = "pendientes";
@@ -144,7 +150,7 @@
     const cont = $("tab-pendientes");
     cont.innerHTML = `<p class="cargando-texto">Cargando…</p>`;
     const { data, error } = await sb.from("fotos")
-      .select("*, perfiles(id, nombre, bloqueado)")
+      .select("*, perfiles(id, nombre)")
       .eq("estado", "pendiente").order("creado", { ascending: true }).limit(50);
     if (error) { cont.innerHTML = `<p class="vacio">${_esc(mensajeError(error))}</p>`; return; }
     if (!data.length) { cont.innerHTML = `<div class="vacio"><b>¡Todo al día!</b>No hay fotos esperando revisión.</div>`; return; }
@@ -297,7 +303,10 @@
   /* ---------- Usuarios bloqueados ---------- */
   async function cargarBloqueados() {
     const cont = $("tab-bloqueados");
-    const { data, error } = await sb.from("perfiles").select("id, nombre, creado").eq("bloqueado", true).order("nombre");
+    // usuarios_bloqueados() es solo para el admin; si aún no existe, se usa la consulta antigua
+    let { data, error } = await sb.rpc("usuarios_bloqueados");
+    if (error && /function|could not find/i.test(error.message))
+      ({ data, error } = await sb.from("perfiles").select("id, nombre, creado").eq("bloqueado", true).order("nombre"));
     if (error) { cont.innerHTML = `<p class="vacio">${_esc(mensajeError(error))}</p>`; return; }
     if (!data.length) { cont.innerHTML = `<div class="vacio"><b>Nadie bloqueado</b>Ojalá siga así.</div>`; return; }
     cont.innerHTML = `<div class="lista-moderacion">${data.map((p) => `
@@ -324,7 +333,8 @@
     }
     const yo = usuario();
     if (!yo) {
-      bloquear(`<b>Entra con tu correo de administración</b><button class="boton" type="button" onclick="abrirEntrar()">Entrar</button>`);
+      bloquear(`<b>Entra con tu correo de administración</b><button class="boton" type="button" id="btn-entrar-admin">Entrar</button>`);
+      $("btn-entrar-admin").addEventListener("click", () => abrirEntrar());
       return;
     }
     if (!esAdmin()) {
